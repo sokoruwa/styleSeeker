@@ -1,0 +1,17 @@
+{
+  "name": "styleAI",
+  "version": "1.0.0",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.9.0",
+    "mongoose": "^6.0.12"
+  },
+  "devDependencies": {
+    "sass": "^1.77.8"
+  }
+}
