@@ -4,11 +4,6 @@ body {
     margin: 0;
     padding: 0;
 
-    /* background: radial-gradient(#97370e 15%, transparent 16%, transparent 49%, #97370e 50%, transparent 51%),radial-gradient(circle at top left, #97370e 10%, transparent 10%, transparent 39%, #97370e 40%, transparent 41%),radial-gradient(circle at top right, #97370e 10%, transparent 10%, transparent 39%, #97370e 40%, transparent 41%),radial-gradient(circle at bottom left, #97370e 10%, transparent 10%, transparent 39%, #97370e 40%, transparent 41%),radial-gradient(circle at bottom right, #97370e 10%, transparent 10%, transparent 39%, #97370e 40%, transparent 41%);
-    background-size: 3em 3em;
-    background-color: #ffffff;
-    opacity: 1 */
-
      
     background-image: 
         linear-gradient(

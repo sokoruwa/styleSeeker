@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage TV Portfolio</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            color: white;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+         
+    </style>
+</head>
+<body>
+    <div class="scene-container">
+        <div class="room">
+            <div class="wall"></div>
+            <div class="window window-left"></div>
+            <div class="window window-right"></div>
+            <div class="wall-frame frame-left"></div>
+            <div class="wall-frame frame-right"></div>
+        </div>
+        
+        <div class="plant plant-left">
+            <div class="plant-pot"></div>
+            <div class="plant-leaves">
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+            </div>
+        </div>
+        
+        <div class="plant plant-right">
+            <div class="plant-pot"></div>
+            <div class="plant-leaves">
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+            </div>
+        </div>
+        
+        <div class="wall-shadow"></div>
+        <div class="floor"></div>
+        <div class="ambient-light"></div>
+        
+        <div class="tv-stand-container">
+            <div class="tv-stand">
+                <div class="tv-stand-shimmer"></div>
+            </div>
+            <div class="tv-container">
+                <div class="tv-frame">
+                    <div class="tv-screen">
+                        <div class="color-bars"></div>
+                        <div class="screen-content" id="screen-content">
+                            <!-- Content will be dynamically loaded here -->
+                        </div>
+                        <div class="tv-effect"></div>
+                        <div class="tv-static"></div>
+                    </div>
+                    <div class="tv-details">
+                        <div class="tv-knobs"></div>
+                        <div class="tv-brand">STYLE AI 2000</div>
+                    </div>
+                </div>
+                
+                <div class="remote-control">
+                    <div class="remote-power" id="power-btn">POWER</div>
+                    <div class="channel-number">CH-1</div>
+                    
+                    <div class="remote-btn vol-up">VOL+</div>
+                    <div class="remote-btn mute">MUTE</div>
+                    <div class="remote-btn ch-up">CH+</div>
+                    
+                    <div class="remote-btn vol-down">VOL-</div>
+                    <div class="remote-btn" data-screen="login">LOGIN</div>
+                    <div class="remote-btn ch-down">CH-</div>
+                    
+                    <div class="remote-btn num-btn">1</div>
+                    <div class="remote-btn" data-screen="fit_calculator">FIT</div>
+                    <div class="remote-btn num-btn">2</div>
+                    
+                    <div class="remote-btn num-btn">3</div>
+                    <div class="remote-btn" data-screen="create_account">SIGN UP</div>
+                    <div class="remote-btn num-btn">4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/index.js"></script>
+    <script src="js/global.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function createSparkle() {
+            const container = document.querySelector('.tv-stand-container');
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            
+            // Add the sparkle
+            container.appendChild(sparkle);
+            
+            // Remove the sparkle after animation completes
+            setTimeout(() => {
+                sparkle.remove();
+            }, 2500); // Slightly longer than animation duration
+        }
+
+        // Create initial batch of sparkles
+        for (let i = 0; i < 30; i++) {
+            createSparkle();
+        }
+    });
+    </script>
+</body>
+</html>

@@ -18,6 +18,7 @@ const { MongoClient, ObjectId } = require('mongodb'); // Add this line for Mongo
 const MongoStore = require('connect-mongo');
 const cors = require('cors');  // Add this line
 const session = require('express-session');
+const path = require('path');
 
 // Add SECRET_KEY and users array
 const SECRET_KEY = 'your_secret_key'; // In a real app, use an environment variable
@@ -82,8 +83,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/public/index.html');
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // mongoose.connect('mongodb://localhost:27017/storyDB', { useNewUrlParser: true, useUnifiedTopology: true })
