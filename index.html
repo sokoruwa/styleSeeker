@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro TV Interface</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <div class="brick-wall">
+        <div class="scene-container">
+            <div class="tv-setup">
+                <!-- Wall Mount -->
+                <div class="wall-mount">
+                    <div class="mount-bracket left"></div>
+                    <div class="mount-bracket right"></div>
+                    <div class="mount-arm"></div>
+                </div>
+                
+                <!-- TV -->
+                <div class="tv-container">
+                    <div class="tv-frame tv-off">
+                        <div class="tv-screen">
+                            <div class="tv-static"></div>
+                            <div class="tv-effect"></div>
+                            <div class="screen-content" id="screen-content">Select a Page</div>
+                        </div>
+                        <div class="tv-brand">RETRO-TV</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote Setup -->
+            <div class="remote-setup">
+                <div class="remote-holder">
+                    <div class="holder-front"></div>
+                    <div class="holder-back"></div>
+                    <div class="holder-bracket"></div>
+                </div>
+                
+                <div class="remote">
+                    <div class="channel-indicator">CH-1</div>
+                    <button class="remote-btn power-btn" id="power-btn"></button>
+                    <button class="remote-btn" data-screen="login">1</button>
+                    <button class="remote-btn" data-screen="fit_calculator">2</button>
+                    <button class="remote-btn" data-screen="create_account">3</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/index.js"></script>
+</body>
+</html> 

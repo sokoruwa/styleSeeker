@@ -55,7 +55,7 @@ app.use(session({
     saveUninitialized: true,
     store: MongoStore.create({ 
         client: client,
-        dbName: "styleAI", // specify the database name
+        dbName: "styleSeeker", // specify the database name
         collectionName: "sessions" // optional: specify the collection name
     }),
     cookie: { secure: false } // Set to true if using HTTPS
@@ -110,7 +110,7 @@ app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     
     try {
-        const database = client.db("styleAI");
+        const database = client.db("styleSeeker");
         const users = database.collection("users");
 
         // Find user
@@ -147,7 +147,7 @@ app.post('/api/create-account', async (req, res) => {
     const { firstName, lastName, username, email, password } = req.body;
 
     try {
-        const database = client.db("styleAI");
+        const database = client.db("styleSeeker");
         const users = database.collection("users");
 
         // Check if username or email already exists
@@ -188,7 +188,7 @@ app.post('/api/save-measurements', async (req, res) => {
         const { height, bust, waist, hips, hipDips, bodyType, outfit } = req.body;
         const userId = new ObjectId(req.session.userId); // Convert string to ObjectId
 
-        const database = client.db("styleAI");
+        const database = client.db("styleSeeker");
         const users = database.collection("users");
 
         const result = await users.updateOne(
@@ -225,7 +225,7 @@ app.get('/api/user-profile', async (req, res) => {
     }
 
     try {
-        const database = client.db("styleAI");
+        const database = client.db("styleSeeker");
         const users = database.collection("users");
 
         const user = await users.findOne({ _id: new ObjectId(req.session.userId) });
@@ -291,7 +291,7 @@ app.use((req, res, next) => {
 
 app.get('/api/check-user/:username', async (req, res) => {
     const { username } = req.params;
-    const database = client.db("styleAI");
+    const database = client.db("styleSeeker");
     const users = database.collection("users");
     const user = await users.findOne({ username: username });
     if (user) {

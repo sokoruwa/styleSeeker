@@ -9,7 +9,7 @@ body {
     background-color: #ffffff;
     opacity: 1 */
 
-    /* Free SVG Background by <a target="zhangshine" href="https://bgjar.com">BGJar</a> */
+     
     background-image: 
         linear-gradient(
             to bottom right,
@@ -96,7 +96,7 @@ button:hover {
     padding: 15px;
     background-color: #f8f9fa;
     border-radius: 5px;
-    display: none; /* This will be overridden by JavaScript */
+    display: none;  
 }
 
 #bodyTypeResult, #outfitDisplay {

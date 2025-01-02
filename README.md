@@ -1,5 +1,5 @@
-# styleAI
-StyleAI: An AI-powered fashion recommendation system. 
+# styleSeeker
+styleSeeker: An AI-powered fashion recommendation system. 
 
 Features: 
 • Personalized style suggestions 
@@ -20,7 +20,7 @@ Revolutionizing personal style with AI. Contribute or try it out!
 
 ## Getting Started
 
-Follow these instructions to set up and run the StyleAI project on your local machine.
+Follow these instructions to set up and run the styleSeeker project on your local machine.
 
 ### Prerequisites
 
@@ -32,8 +32,8 @@ Follow these instructions to set up and run the StyleAI project on your local ma
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/styleAI.git
-   cd styleAI
+   git clone https://github.com/yourusername/styleSeeker.git
+   cd styleSeeker
    ```
 
 2. Install dependencies:
@@ -46,7 +46,7 @@ Follow these instructions to set up and run the StyleAI project on your local ma
    - Create a new database for the project:
      ```
      mongo
-     use styleAI
+     use styleSeeker
      exit
      ```
 
@@ -55,7 +55,7 @@ Follow these instructions to set up and run the StyleAI project on your local ma
    - Add the following variables (adjust as needed):
      ```
      PORT=3000
-     MONGODB_URI=mongodb://localhost:27017/styleAI
+     MONGODB_URI=mongodb://localhost:27017/styleSeeker
      ```
 
 ### Running the Project
@@ -113,4 +113,4 @@ Replace `server.js` with your main server file.
 To manage your MongoDB database, you can use MongoDB Compass, a GUI tool for MongoDB:
 
 1. Download and install [MongoDB Compass](https://www.mongodb.com/try/download/compass)
-2. Connect to your database using the connection string: `mongodb://localhost:27017/styleAI`
+2. Connect to your database using the connection string: `mongodb://localhost:27017/styleSeeker`
