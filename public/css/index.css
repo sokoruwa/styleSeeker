@@ -72,7 +72,7 @@ body {
     backdrop-filter: blur(8px) !important;
 }
 
-/* Different animation paths */
+ 
 .x1 {
     animation: floatUp 25s linear infinite !important;
     left: 5% !important;
@@ -122,7 +122,7 @@ body {
     }
 }
 
-/* Hover effect */
+ 
 .top-right-button:hover {
     background: rgba(0, 0, 0, 0.6) !important;
     animation-play-state: paused !important;
@@ -147,13 +147,13 @@ body {
     cursor: pointer !important;
     z-index: 999999 !important;
     
-    /* Bubble styling */
+     
     box-shadow: 
         0 20px 30px rgba(0, 0, 0, 0.2),
         inset 0px 10px 30px 5px rgba(255, 255, 255, 1) !important;
     backdrop-filter: blur(8px) !important;
     
-    /* Animation */
+     
     animation: moveAroundScreen 20s linear infinite !important;
 }
 
@@ -215,7 +215,7 @@ body {
     }
 }
 
-/* Bubble shine effect */
+ 
 .video-container .content-overlay .top-right-button::after {
     content: "" !important;
     position: absolute !important;
@@ -228,7 +228,7 @@ body {
     box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Hover effect */
+ 
 .video-container .content-overlay .top-right-button:hover {
     background: rgba(0, 0, 0, 0.6) !important;
     animation-play-state: paused !important;
@@ -337,7 +337,7 @@ body {
     transform: translateY(-50%) translateX(-10px) scale(0.98) !important;
 }
 
-/* Natural bubble movement */
+ 
 @keyframes bubbleFloat {
     0% {
         transform: translate(0, 0) rotate(0deg);
@@ -353,7 +353,7 @@ body {
     }
 }
 
-/* Small wobble animation */
+ 
 @keyframes wobble {
     0%, 100% {
         transform: scale(1) rotate(0deg);
@@ -366,7 +366,7 @@ body {
     }
 }
 
-/* Make all buttons have white text */
+ 
 .video-container .floating-buttons .top-right-button,
 .top-right-button.x1,
 .top-right-button.x2,
