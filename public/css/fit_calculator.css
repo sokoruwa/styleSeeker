@@ -1,19 +1,8 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background-color: #dfceb5;
     margin: 0;
     padding: 0;
-
-     
-    background-image: 
-        linear-gradient(
-            to bottom right,
-            rgba(26, 9, 15, 0.9),
-            rgba(77, 139, 49, 0.3),
-            rgba(255, 132, 39, 0.3),
-            rgba(247, 238, 127, 0.3)
-        ),
-        url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='1440' height='1148' preserveAspectRatio='none' viewBox='0 0 1440 1148'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1390%26quot%3b)' fill='none'%3e%3crect width='1440' height='1148' x='0' y='0' fill='rgba(26%2c 9%2c 15%2c 1)'%3e%3c/rect%3e%3cpath d='M75.97 287C56.61 224.53 16.33 238.8 0 177.09C-21.65 95.3 -54.76 33.79 0 0C88.74 -54.76 143.5 0 287 0C417.45 0 418.27 -4.47 547.91 0C561.77 0.48 560.31 9.9 574 9.9C621.19 9.9 621.67 1.66 669.67 0C765.17 -3.29 765.34 0 861 0C1004.5 0 1004.5 0 1148 0C1291.5 0 1291.5 0 1435 0C1578.5 0 1650.25 -71.75 1722 0C1793.75 71.75 1722 143.5 1722 287C1722 404.88 1786.65 465.82 1722 522.75C1643.15 592.18 1576.28 553.91 1435 539.73C1289.28 525.1 1266.67 452.87 1148 465.14C1100.94 470.01 1103.54 525.03 1103.54 574C1103.54 598.25 1120.06 609.03 1148 611.58C1285.79 624.14 1317.3 547.68 1435 604.21C1576.97 672.39 1573.78 719.72 1667.33 861C1717.28 936.43 1704.88 947.76 1722 1037.62C1732.22 1091.26 1761.86 1132.67 1722 1148C1618.36 1187.86 1578.5 1148 1435 1148C1291.5 1148 1291.5 1148 1148 1148C1004.5 1148 1004.5 1148 861 1148C717.5 1148 717.5 1148 574 1148C430.5 1148 430.5 1148 287 1148C143.5 1148 71.75 1219.75 0 1148C-71.75 1076.25 0 1004.5 0 861C0 789.25 -26.54 779.43 0 717.5C34.96 635.93 108.04 658.79 123 574C146.02 443.54 118.11 422.98 75.97 287' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M861 82C826.14 82 817.52 191.29 817.52 287C817.52 314.29 835.36 328 861 328C908.35 328 963.5 326.99 963.5 287C963.5 203.99 899.13 82 861 82' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M574 546.23C543.84 546.23 507.77 561.16 507.77 574C507.77 586.53 543.14 596.96 574 596.96C589.3 596.96 600.09 586.1 600.09 574C600.09 560.73 590 546.23 574 546.23' stroke='rgba(44%2c 130%2c 17%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M287 742.82C232.05 742.82 148.45 809.86 148.45 861C148.45 904.82 226.87 932.75 287 932.75C320.35 932.75 335.41 899.36 335.41 861C335.41 804.4 325.53 742.82 287 742.82' stroke='rgba(184%2c 28%2c 177%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M861 851.74C857.02 851.74 852.92 855.35 852.92 861C852.92 877.92 857.06 896.88 861 896.88C864.93 896.88 868.65 878 868.65 861C868.65 855.43 864.89 851.74 861 851.74' stroke='rgba(44%2c 130%2c 17%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M181.49 287C181.49 167.41 195.54 83.57 287 47.83C391.8 6.87 448.59 62.49 574 133.6C659.49 182.08 708.8 211.42 708.8 287C708.8 359.87 657.14 383.36 574 430.5C446.24 502.94 392.28 564.66 287 526.17C196.03 492.91 181.49 406.59 181.49 287' stroke='rgba(255%2c 255%2c 255%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M127.56 0C127.56 6.16 53.68 24.43 0 24.43C-10.1 24.43 -10.25 1.96 0 0C53.53 -10.25 127.56 -6.05 127.56 0' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M1197 287C1137 177.32 1133.13 78.65 1198.35 0C1252.13 -64.85 1316.68 0 1435 0C1578.5 0 1650.25 -71.75 1722 0C1793.75 71.75 1722 143.5 1722 287C1722 362.16 1771.32 412.3 1722 437.33C1627.82 485.12 1568.11 470.75 1435 432.64C1305.61 395.59 1255.33 393.64 1197 287' stroke='rgba(255%2c 255%2c 255%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M708.8 574C786.02 503.48 786.21 430.5 861 430.5C933.05 430.5 928.72 505.51 1002.48 574C1072.22 638.76 1061.71 672.14 1148 697C1277.97 734.45 1311.94 652.11 1435 698.62C1528.9 734.11 1581.92 772.82 1581.92 861C1581.92 975 1542.44 1050.5 1435 1102.98C1325.48 1156.47 1267.35 1134.3 1148 1072.94C1032.01 1013.31 1055.25 967.74 964.32 861C911.75 799.28 913.5 736.02 861 736.02C807.27 736.02 764.35 786.01 751.86 861C730.04 992 843.09 1066.16 792.37 1148C754.16 1209.66 683.18 1148 574 1148C430.5 1148 430.5 1148 287 1148C143.5 1148 80.95 1210.55 0 1148C-62.55 1099.67 -59.07 944.16 0 926.23C84.43 900.6 167.19 1079.41 287 1060.88C378.12 1046.79 347.93 955.85 421.86 861C491.43 771.73 493.91 772.74 574 692.63C637.38 629.24 642.52 634.54 708.8 574' stroke='rgba(184%2c 28%2c 177%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M287 287C287 272.63 436.32 257.31 574 257.31C592.86 257.31 600.09 272.37 600.09 287C600.09 301.1 592.27 314.77 574 314.77C435.73 314.77 287 301.36 287 287' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M1372 287C1327.83 157.18 1301.42 103.93 1324.23 0C1332.92 -39.57 1379.61 0 1435 0C1578.5 0 1650.25 -71.75 1722 0C1793.75 71.75 1722 143.5 1722 287C1722 319.46 1748.38 348.38 1722 351.92C1604.88 367.65 1574.3 351.39 1435 325.55C1399.3 318.93 1383.21 319.96 1372 287' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M817.52 574C817.52 552.84 839.63 533 861 533C881.58 533 901.42 552.89 901.42 574C901.42 596.53 881.63 620.29 861 620.29C839.68 620.29 817.52 596.49 817.52 574' stroke='rgba(255%2c 255%2c 255%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M508.3 861C527.83 816.93 539.73 788.29 574 788.29C610.98 788.29 642.41 812.61 650.8 861C673.6 992.47 667.94 1030.1 636.39 1148C629.54 1173.6 605.19 1148 574 1148C494.28 1148 425.91 1197.59 414.56 1148C393.06 1054.09 448.11 996.78 508.3 861' stroke='rgba(44%2c 130%2c 17%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M1059.99 861C1059.99 818.89 1093.4 792.32 1148 782.42C1280.91 758.33 1302.91 763.25 1435 793.03C1477.16 802.54 1496.5 824.09 1496.5 861C1496.5 908.72 1485.92 947.45 1435 962.29C1311.67 998.23 1275.71 997.04 1148 962.55C1088.2 946.4 1059.99 908.96 1059.99 861' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M0 1089.3C55.84 1089.3 151.94 1132.81 151.94 1148C151.94 1162.16 54.8 1169.17 0 1148C-21.17 1139.82 -20.13 1089.3 0 1089.3' stroke='rgba(230%2c 242%2c 47%2c 1)' stroke-width='2'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1390'%3e%3crect width='1440' height='1148' fill='white'%3e%3c/rect%3e%3c/mask%3e%3c/defs%3e%3c/svg%3e");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -25,9 +14,9 @@ body {
     margin: 50px auto;
     padding: 40px 60px;
     background: linear-gradient(135deg, 
-        rgba(255, 189, 248, 0.2), 
-        rgba(247, 238, 127, 0.2),
-        rgba(255, 132, 39, 0.2)
+        rgba(240, 108, 227, 0.2), 
+        rgba(192, 11, 232, 0.2),
+        rgba(107, 14, 129, 0.2)
     );
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     box-shadow: 0 0 10px rgba(26, 9, 15, 0.05);
@@ -42,6 +31,38 @@ body {
         15% 100%, 
         0% 85%
     );
+    padding-bottom: 40px !important;
+    position: relative !important;
+}
+
+.container::before {
+    content: '' !important;
+    position: fixed !important;
+    width: 200px !important;
+    height: 150px !important;
+    background-image: url('/styleJPGs/pile1.png') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    left: calc(30% - 60px) !important;
+    bottom: 20px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    transition: opacity 0.5s ease-out !important;
+    opacity: 1 !important;
+}
+
+.container.pile-hidden::before {
+    opacity: 0 !important;
+}
+
+button[type="submit"]:active ~ .container::before,
+button[type="submit"]:focus ~ .container::before {
+    opacity: 0 !important;
+}
+
+button[type="submit"]:active {
+    transform: translateY(1px) scale(0.98) !important;
+    box-shadow: 0 2px 10px rgba(192, 11, 232, 0.3) !important;
 }
 
 h1, h3 {
@@ -73,17 +94,119 @@ input {
     border-radius: 4px;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+button[type="submit"] {
+    position: relative !important;
+    padding: 12px 20px !important;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(173, 216, 255, 0.2) 10%,
+        rgba(1, 21, 68, 0.15) 30%,
+        rgba(255, 182, 193, 0.15) 50%,
+        rgba(135, 206, 255, 0.15) 70%,
+        rgba(255, 192, 203, 0.1) 85%,
+        rgba(1, 21, 68, 0.15) 100%
+    ) !important;
+    color: white !important;
+    font-size: 0 !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.3),
+        0 0 25px rgba(192, 11, 232, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+    width: auto !important;
+    min-width: 120px !important;
+    max-width: 140px !important;
+    height: 120px !important;
+    margin: 20px auto 0 25% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.5 !important;
+    white-space: pre-line !important;
+    text-align: center !important;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40% !important;
+    animation: blobby 8s ease-in-out infinite !important;
+    transform: translateY(-25%) !important;
+    z-index: 1 !important;
+    transition: all 0.3s ease-out !important;
 }
 
-button:hover {
-    background-color: #0056b3;
+@keyframes blobby {
+    0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    25% {
+        border-radius: 70% 30% 45% 55% / 40% 50% 50% 60%;
+    }
+    50% {
+        border-radius: 40% 60% 60% 40% / 70% 30% 70% 30%;
+    }
+    75% {
+        border-radius: 30% 70% 70% 30% / 50% 60% 40% 50%;
+    }
+    100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+}
+
+button[type="submit"]::before {
+    content: "Click\A to\A Calculate!" !important;
+    white-space: pre !important;
+    font-size: 10px !important;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-45%) !important;
+    z-index: 3 !important;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.4),
+        0 0 30px rgba(192, 11, 232, 0.4),
+        0 0 40px rgba(240, 108, 227, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.3) !important;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(173, 216, 255, 0.6) 10%,
+        rgba(240, 108, 227, 0.5) 30%,
+        rgba(192, 11, 232, 0.4) 50%,
+        rgba(135, 206, 255, 0.3) 70%,
+        rgba(255, 192, 203, 0.2) 85%,
+        rgba(1, 21, 68, 0.2) 100%
+    ) !important;
+    animation: pulse 2s infinite !important;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 
+            0 0 20px rgba(255, 255, 255, 0.4),
+            0 0 30px rgba(192, 11, 232, 0.4),
+            0 0 40px rgba(240, 108, 227, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 25px rgba(255, 255, 255, 0.5),
+            0 0 35px rgba(192, 11, 232, 0.5),
+            0 0 45px rgba(240, 108, 227, 0.3),
+            inset 0 0 35px rgba(255, 255, 255, 0.4);
+    }
+    100% {
+        box-shadow: 
+            0 0 20px rgba(255, 255, 255, 0.4),
+            0 0 30px rgba(192, 11, 232, 0.4),
+            0 0 40px rgba(240, 108, 227, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+}
+
+button[type="submit"]:active {
+    transform: translateY(1px) scale(0.98) !important;
+    box-shadow: 0 2px 10px rgba(192, 11, 232, 0.3) !important;
 }
 
 #outputBox {

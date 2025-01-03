@@ -1,4 +1,4 @@
-// Add click event handler for the button
+
 document.addEventListener('DOMContentLoaded', function() {
     const button = document.querySelector('.top-right-button');
     

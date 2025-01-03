@@ -11,6 +11,23 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('Logout button not found');
     }
+
+    const submitButton = document.querySelector('button[type="submit"]');
+    const container = document.querySelector('.container');
+    const form = document.querySelector('form');  // Get the form element
+
+    submitButton.addEventListener('click', function(event) {
+        // Check if all required fields are filled
+        const height = document.getElementById('height').value;
+        const bust = document.getElementById('bust').value;
+        const waist = document.getElementById('waist').value;
+        const hips = document.getElementById('hips').value;
+
+        // Only hide the pile if all fields have values
+        if (height && bust && waist && hips) {
+            container.classList.add('pile-hidden');
+        }
+    });
 });
 
 function parseHeight(height) {

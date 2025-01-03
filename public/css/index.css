@@ -24,7 +24,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
     z-index: 2;
 }
 
@@ -45,58 +44,216 @@ body {
 
 .top-right-button {
     position: fixed !important;
-    top: 50% !important;
-    right: 20px !important;
-    transform: translateY(-50%) !important;
-    padding: 15px 30px !important;
-    background-color: red !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    cursor: pointer !important;
-    z-index: 999999 !important;
-    transition: all 0.3s ease !important;
-    font-size: 16px !important;
-}
-
-.top-right-button:hover {
-    background-color: #333;
-    transform: translateY(-50%) scale(1.05);
-}
-
-.video-container .content-overlay .top-right-button {
-    position: fixed !important;
-    top: 33% !important;
-    right: 430px !important;
     padding: 20px 40px !important;
-    transform: translateY(-50%) !important;
-    background-color: rgba(0, 0, 0, 0.8) !important;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(173, 216, 230, 0.3) 0%,
+        rgba(1, 21, 68, 0.5) 40%,
+        rgba(147, 112, 219, 0.5) 60%,
+        rgba(219, 112, 147, 0.4) 80%,
+        rgba(1, 21, 68, 0.5) 100%
+    ) !important;
     color: white !important;
-    border: 2px solid white !important;
-    cursor: pointer !important;
-    z-index: 999999 !important;
-    transition: all 0.3s ease !important;
-    font-size: 16px !important;
-    font-weight: 500 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
     border-radius: 50% !important;
-    width: 120px !important;
-    height: 120px !important;
+    width: 150px !important;
+    height: 150px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    z-index: 999999 !important;
+    box-shadow: 
+        0 20px 30px rgba(0, 0, 0, 0.2),
+        inset 0px 10px 30px 5px rgba(255, 255, 255, 1) !important;
+    backdrop-filter: blur(8px) !important;
 }
 
-.video-container .content-overlay .top-right-button:hover {
-    background-color: white !important;
+/* Different animation paths */
+.x1 {
+    animation: floatUp 25s linear infinite !important;
+    left: 5% !important;
+}
+
+.x2 {
+    animation: floatUp 20s linear infinite !important;
+    left: 35% !important;
+    animation-delay: -5s !important;
+}
+
+.x3 {
+    animation: floatUp 28s linear infinite !important;
+    left: 55% !important;
+    animation-delay: -8s !important;
+}
+
+.x4 {
+    animation: floatUp 22s linear infinite !important;
+    left: 75% !important;
+    animation-delay: -12s !important;
+}
+
+.x5 {
+    animation: floatUp 29s linear infinite !important;
+    left: 90% !important;
+    animation-delay: -15s !important;
+}
+
+@keyframes floatUp {
+    0% {
+        top: 100%;
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.1) rotate(45deg);
+    }
+    50% {
+        transform: scale(0.9) rotate(90deg);
+    }
+    75% {
+        transform: scale(1.05) rotate(180deg);
+    }
+    100% {
+        top: -20%;
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+/* Hover effect */
+.top-right-button:hover {
+    background: rgba(0, 0, 0, 0.6) !important;
+    animation-play-state: paused !important;
+    transform: scale(1.1) !important;
+}
+
+.video-container .content-overlay .top-right-button {
+    position: fixed !important;
+    padding: 20px 40px !important;
+    background: rgba(0, 0, 0, 0.5) !important;
     color: black !important;
-    transform: translateY(-50%) translateX(-10px) !important;
+    border-radius: 50% !important;
+    width: 150px !important;
+    height: 150px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    z-index: 999999 !important;
+    
+    /* Bubble styling */
+    box-shadow: 
+        0 20px 30px rgba(0, 0, 0, 0.2),
+        inset 0px 10px 30px 5px rgba(255, 255, 255, 1) !important;
+    backdrop-filter: blur(8px) !important;
+    
+    /* Animation */
+    animation: moveAroundScreen 20s linear infinite !important;
 }
 
-.video-container .content-overlay .top-right-button:active {
-    transform: translateY(-50%) translateX(-10px) scale(0.98) !important;
+@keyframes moveAroundScreen {
+    0% {
+        top: 80%;
+        left: 20%;
+        transform: rotate(0deg);
+    }
+    10% {
+        top: 40%;
+        left: 80%;
+        transform: rotate(45deg);
+    }
+    20% {
+        top: 10%;
+        left: 40%;
+        transform: rotate(90deg);
+    }
+    30% {
+        top: 50%;
+        left: 10%;
+        transform: rotate(135deg);
+    }
+    40% {
+        top: 90%;
+        left: 60%;
+        transform: rotate(180deg);
+    }
+    50% {
+        top: 30%;
+        left: 90%;
+        transform: rotate(225deg);
+    }
+    60% {
+        top: 70%;
+        left: 40%;
+        transform: rotate(270deg);
+    }
+    70% {
+        top: 20%;
+        left: 70%;
+        transform: rotate(315deg);
+    }
+    80% {
+        top: 60%;
+        left: 20%;
+        transform: rotate(360deg);
+    }
+    90% {
+        top: 40%;
+        left: 50%;
+        transform: rotate(405deg);
+    }
+    100% {
+        top: 80%;
+        left: 20%;
+        transform: rotate(360deg);
+    }
+}
+
+/* Bubble shine effect */
+.video-container .content-overlay .top-right-button::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    width: 130px !important;
+    height: 130px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%) !important;
+    box-shadow: inset 0 20px 30px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Hover effect */
+.video-container .content-overlay .top-right-button:hover {
+    background: rgba(0, 0, 0, 0.6) !important;
+    animation-play-state: paused !important;
+    transform: scale(1.1) !important;
+}
+
+.video-container .content-overlay .top-right-button::before,
+.video-container .content-overlay .top-right-button::after {
+    content: '';
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    animation: trailBubble 3s infinite;
+    pointer-events: none;
+}
+
+.video-container .content-overlay .top-right-button::before {
+    width: 30px;
+    height: 30px;
+    animation-delay: -0.5s;
+}
+
+.video-container .content-overlay .top-right-button::after {
+    width: 20px;
+    height: 20px;
+    animation-delay: -1s;
 }
 
 @keyframes glowBorder {
@@ -108,21 +265,113 @@ body {
     }
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(-50%) translateX(0) rotate(0deg);
-        box-shadow: 
-            0 0 30px rgba(255, 255, 255, 0.2),
-            inset 0 0 30px rgba(255, 255, 255, 0.2);
+@keyframes floatAround {
+    0% {
+        top: 80%;
+        left: 20%;
+        transform: rotate(0deg) scale(1);
     }
-    50% {
-        transform: translateY(-55%) translateX(10px) rotate(5deg);
-        box-shadow: 
-            0 0 50px rgba(255, 255, 255, 0.3),
-            inset 0 0 50px rgba(255, 255, 255, 0.3);
+    15% {
+        top: 20%;
+        left: 40%;
+        transform: rotate(-45deg) scale(0.95);
+    }
+    30% {
+        top: 70%;
+        left: 60%;
+        transform: rotate(30deg) scale(1.05);
+    }
+    45% {
+        top: 30%;
+        left: 80%;
+        transform: rotate(90deg) scale(0.95);
+    }
+    60% {
+        top: 90%;
+        left: 60%;
+        transform: rotate(-20deg) scale(1.05);
+    }
+    75% {
+        top: 40%;
+        left: 40%;
+        transform: rotate(45deg) scale(0.95);
+    }
+    90% {
+        top: 85%;
+        left: 20%;
+        transform: rotate(-45deg) scale(1.05);
+    }
+    100% {
+        top: 80%;
+        left: 20%;
+        transform: rotate(0deg) scale(1);
+    }
+}
+
+@keyframes trailBubble {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50px, -50px) scale(0);
+        opacity: 0;
     }
 }
 
 .video-container .content-overlay .top-right-button {
-    animation: float 3s ease-in-out infinite !important;
+    animation: 
+        bubbleFloat 4s ease-in-out infinite alternate,
+        wobble 2s ease-in-out infinite !important;
+    left: 50% !important;
+    bottom: 20% !important;
+}
+
+.video-container .content-overlay .top-right-button:hover {
+    background: rgba(0, 0, 0, 0.6) !important;
+    transform: scale(1.1) !important;
+    animation-play-state: paused !important;
+}
+
+.video-container .content-overlay .top-right-button:active {
+    transform: translateY(-50%) translateX(-10px) scale(0.98) !important;
+}
+
+/* Natural bubble movement */
+@keyframes bubbleFloat {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(30px, -50px) rotate(10deg);
+    }
+    66% {
+        transform: translate(-20px, -100px) rotate(-5deg);
+    }
+    100% {
+        transform: translate(0, -150px) rotate(0deg);
+    }
+}
+
+/* Small wobble animation */
+@keyframes wobble {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    33% {
+        transform: scale(1.02) rotate(2deg);
+    }
+    66% {
+        transform: scale(0.98) rotate(-2deg);
+    }
+}
+
+/* Make all buttons have white text */
+.video-container .floating-buttons .top-right-button,
+.top-right-button.x1,
+.top-right-button.x2,
+.top-right-button.x3,
+.top-right-button.x4,
+.top-right-button.x5 {
+    color: white !important;
 }
