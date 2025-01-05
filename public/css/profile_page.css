@@ -1,0 +1,227 @@
+/* Base styles */
+body {
+    font-family: "IBM Plex Mono", monospace;
+    background: #111;
+    color: #F2C14E;
+    margin: 0;
+    cursor: default;
+}
+
+/* Glitch background */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(180, 67, 108, 0.05) 0px,
+            rgba(180, 67, 108, 0.05) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Profile Header */
+.profile-header {
+    height: 200px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid #B4436C;
+    margin-bottom: 60px;
+}
+
+.profile-header h1 {
+    font-size: 60px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #F2C14E;
+    text-shadow: 
+        2px 2px 0 #B4436C,
+        -2px -2px 0 rgba(180, 67, 108, 0.5);
+    mix-blend-mode: difference;
+    animation: glitch 4s infinite;
+    margin: 0;
+}
+
+@keyframes glitch {
+    0%, 100% { transform: none; }
+    20% { transform: skewX(3deg); }
+    40% { transform: skewX(-3deg); }
+    60% { text-shadow: 4px 0 #B4436C, -4px 0 #F2C14E; }
+    80% { text-shadow: -4px 0 #B4436C, 4px 0 #F2C14E; }
+}
+
+/* Container and Grid */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+/* Profile Sections */
+.profile-section {
+    border: 3px solid #B4436C;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.profile-section::before {
+    content: attr(data-title);
+    position: absolute;
+    top: -15px;
+    left: 20px;
+    background: #111;
+    padding: 0 10px;
+    font-size: 14px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #B4436C;
+}
+
+.measurements-section {
+    grid-column: span 2;
+}
+
+.body-type-section {
+    grid-column: span 1;
+}
+
+.recommendations-section {
+    grid-column: span 3;
+}
+
+/* Typography */
+h2 {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #F2C14E;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Lists and Data Display */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(180, 67, 108, 0.2);
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 60px;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: #B4436C;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-color: #B4436C;
+    border-right-color: transparent;
+}
+
+/* Update Button Styles */
+.update-measurements-btn {
+    display: inline-block;
+    padding: 15px 30px;
+    background: #B4436C;
+    color: #111;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 30px;
+    transition: all 0.2s;
+}
+
+.update-measurements-btn:hover {
+    background: #F2C14E;
+    color: #111;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-header {
+        height: 150px;
+    }
+
+    .profile-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .measurements-section,
+    .recommendations-section {
+        grid-column: span 1;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Navbar and Dropdown Styles */
+.navbar {
+    background: transparent !important;
+    border-bottom: 2px solid #B4436C;
+}
+
+.navbar-nav .nav-link {
+    color: #F2C14E !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #B4436C !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: #B4436C !important;
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #B4436C;
+    padding: 0;
+}
+
+.dropdown-item {
+    color: #F2C14E !important;
+    padding: 12px 20px;
+    font-family: "IBM Plex Mono", monospace;
+}
+
+.dropdown-item:hover {
+    background: #B4436C !important;
+    color: #111 !important;
+}
+
+.dropdown-divider {
+    display: none;
+}

@@ -1,35 +1,75 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const createAccountForm = document.getElementById('createAccountForm');
+    const form = document.getElementById('createAccountForm');
+    
+    if (!form) {
+        console.error('Create account form not found');
+        return;
+    }
 
-    createAccountForm.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
+        console.log('Form submitted');
 
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        // Get form elements
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const email = document.getElementById('email');
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+
+        // Check if elements exist
+        if (!username || !password || !email || !firstName || !lastName) {
+            console.error('Form fields not found:', {
+                username: !!username,
+                password: !!password,
+                email: !!email,
+                firstName: !!firstName,
+                lastName: !!lastName
+            });
+            alert('Form error: Missing fields');
+            return;
+        }
+
+        // Get values
+        const data = {
+            username: username.value.trim(),
+            password: password.value.trim(),
+            email: email.value.trim(),
+            firstName: firstName.value.trim(),
+            lastName: lastName.value.trim()
+        };
+
+        // Validate values
+        if (!data.username || !data.password || !data.email || !data.firstName || !data.lastName) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        console.log('Sending account data:', {
+            ...data,
+            password: '****'
+        });
 
         fetch('/api/create-account', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ firstName, lastName, username, email, password }),
+            credentials: 'include',
+            body: JSON.stringify(data)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Account created successfully!');
+                alert('Account created successfully! Please log in.');
                 window.location.href = '/login.html';
             } else {
-                alert('Account creation failed: ' + data.message);
-                console.error('Error details:', data.error);
+                throw new Error(data.message || 'Error creating account');
             }
         })
-        .catch((error) => {
-            console.error('Fetch error:', error);
-            alert('An error occurred. Please try again.');
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
         });
     });
 });

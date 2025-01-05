@@ -1,13 +1,65 @@
- 
+/* Base styles */
 body {
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>✨</text></svg>"), auto !important;
+    font-family: "IBM Plex Mono", monospace;
+    background: #111;
+    color: #F2C14E;
+    margin: 0;
+    cursor: default;
 }
 
- 
-button, 
-a, 
-input[type="submit"],
-input[type="button"],
-.clickable {
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:white;font-size:24px;'><text y='50%'>✨</text></svg>"), pointer !important;
+/* Glitch background */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(180, 67, 108, 0.05) 0px,
+            rgba(180, 67, 108, 0.05) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Navbar Styles */
+.navbar {
+    background: transparent !important;
+    border-bottom: 2px solid #B4436C;
+}
+
+.navbar-nav .nav-link {
+    color: #F2C14E !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #B4436C !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: #B4436C !important;
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #B4436C;
+    padding: 0;
+}
+
+.dropdown-item {
+    color: #F2C14E !important;
+    padding: 12px 20px;
+    font-family: "IBM Plex Mono", monospace;
+}
+
+.dropdown-item:hover {
+    background: #B4436C !important;
+    color: #111 !important;
+}
+
+.dropdown-divider {
+    display: none;
 }

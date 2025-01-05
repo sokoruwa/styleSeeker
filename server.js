@@ -19,6 +19,8 @@ const MongoStore = require('connect-mongo');
 const cors = require('cors');  // Add this line
 const session = require('express-session');
 const path = require('path');
+const mongoose = require('mongoose');
+const User = require('./models/User'); // Add this line
 
 // Add SECRET_KEY and users array
 const SECRET_KEY = 'your_secret_key'; // In a real app, use an environment variable
@@ -41,35 +43,25 @@ async function connectToMongo() {
 }
 connectToMongo();
 
-// Set up session middleware
-app.use(session({
-    secret: 'your-secret-key', // Replace with a real secret key
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using https
-}));
-
-// Session middleware setup
+// Session configuration
 app.use(session({
     secret: 'your-secret-key',
-    resave: false,
+    resave: true,
     saveUninitialized: true,
-    store: MongoStore.create({ 
-        client: client,
-        dbName: "styleSeeker", // specify the database name
-        collectionName: "sessions" // optional: specify the collection name
-    }),
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000
+    }
 }));
+
+// Debug middleware
+app.use((req, res, next) => {
+    console.log('Session:', req.session);
+    next();
+});
 
 // Other middleware
-app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your client's URL
-  credentials: true
-}));
-
-// Move the session middleware setup here, before your routes
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:3000', // Replace with your client's URL
@@ -105,75 +97,132 @@ app.get('/fit_calculator', function(req, res) {
     res.sendFile(__dirname + '/public/fit_calculator.html');
 });
 
-// Add new login route
+// Login endpoint
 app.post('/api/login', async (req, res) => {
-    console.log('Login attempt:', req.body);
     const { username, password } = req.body;
-    
+    console.log('Login attempt for:', username);
+
     try {
-        const database = client.db("styleSeeker");
-        const users = database.collection("users");
+        // Find user and log the result
+        const user = await User.findOne({ username });
+        console.log('Found user:', user);
 
-        // Find user
-        const user = await users.findOne({ username: username });
-        console.log('User found:', user ? 'Yes' : 'No');
-        
         if (!user) {
-            console.log('User not found:', username);
-            return res.status(401).json({ success: false, message: 'Invalid username or password' });
+            console.log('No user found with username:', username);
+            return res.json({ success: false, message: 'User not found' });
         }
 
-        // Check password
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', isMatch);
-        
-        if (isMatch) {
-            console.log('Session before setting userId:', req.session);
-            req.session.userId = user._id.toString(); // Convert ObjectId to string
-            req.session.username = user.username; // Add this line
-            console.log('Session after setting userId:', req.session);
-            res.json({ success: true, username: user.username }); // Modified this line
-        } else {
+        if (!isMatch) {
             console.log('Password mismatch for user:', username);
-            res.status(401).json({ success: false, message: 'Invalid username or password' });
+            return res.json({ success: false, message: 'Invalid password' });
         }
+
+        // Set session data
+        req.session.userId = user._id;
+        req.session.username = user.username;  // Use user.username from database
+        req.session.isLoggedIn = true;
+
+        // Log session data
+        console.log('Session after login:', {
+            userId: req.session.userId,
+            username: req.session.username,
+            isLoggedIn: req.session.isLoggedIn
+        });
+
+        await new Promise((resolve) => req.session.save(resolve));
+
+        res.json({
+            success: true,
+            username: user.username,
+            message: 'Login successful'
+        });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.json({ success: false, message: 'Login failed' });
     }
 });
 
-// New route for account creation
+// Check login status
+app.get('/api/check-login', (req, res) => {
+    console.log('Check login session:', req.session);
+    res.json({
+        isLoggedIn: !!req.session.isLoggedIn,
+        username: req.session.username
+    });
+});
+
+// Logout endpoint
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.json({ success: false, message: 'Logout failed' });
+        }
+        res.json({ success: true, message: 'Logged out successfully' });
+    });
+});
+
 app.post('/api/create-account', async (req, res) => {
+    console.log('=== Create Account Request ===');
+    console.log('Request body:', { ...req.body, password: '****' });
+
     const { firstName, lastName, username, email, password } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !username || !email || !password) {
+        console.log('Missing required fields');
+        return res.status(400).json({
+            success: false,
+            message: 'All fields are required'
+        });
+    }
 
     try {
         const database = client.db("styleSeeker");
         const users = database.collection("users");
 
-        // Check if username or email already exists
+        console.log('Checking for existing user...');
         const existingUser = await users.findOne({ $or: [{ username }, { email }] });
+        
         if (existingUser) {
-            return res.json({ success: false, message: 'Username or email already exists' });
+            console.log('User already exists:', {
+                existingUsername: existingUser.username,
+                existingEmail: existingUser.email
+            });
+            return res.status(409).json({ 
+                success: false, 
+                message: `Account already exists with ${existingUser.username === username ? 'this username' : 'this email'}`
+            });
         }
 
         // Hash the password
+        console.log('Hashing password...');
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert the new user
+        console.log('Inserting new user...');
         const result = await users.insertOne({
             firstName,
             lastName,
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            createdAt: new Date()
         });
 
-        console.log('User inserted:', result);
-        res.json({ success: true, message: 'Account created successfully' });
+        console.log('User created successfully:', result.insertedId);
+        res.status(200).json({ 
+            success: true, 
+            message: 'Account created successfully'
+        });
     } catch (error) {
-        console.error('Detailed account creation error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred during account creation', error: error.message });
+        console.error('Create account error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'An error occurred during account creation', 
+            error: error.message 
+        });
     }
 });
 
@@ -250,26 +299,6 @@ app.get('/api/user-profile', async (req, res) => {
     }
 });
 
-app.get('/api/check-login', (req, res) => {
-    console.log('Checking login. Session:', req.session);
-    if (req.session && req.session.userId) {
-        console.log('User is logged in. User ID:', req.session.userId);
-        res.json({ isLoggedIn: true, username: req.session.username });
-    } else {
-        console.log('User is not logged in.');
-        res.json({ isLoggedIn: false });
-    }
-});
-
-app.post('/api/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Could not log out, please try again' });
-        }
-        res.json({ success: true });
-    });
-});
-
 app.listen(3000, function () {
     console.log("server started at 3000");
     // const rawData=fs.readFileSync(__dirname+"/public/data/data10.json");
@@ -301,3 +330,21 @@ app.get('/api/check-user/:username', async (req, res) => {
         res.json({ exists: false });
     }
 });
+
+// Add this debugging route
+app.get('/api/debug/users', async (req, res) => {
+    try {
+        const users = await User.find({}, 'username email');
+        console.log('All users:', users);
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Error fetching users' });
+    }
+});
+
+// Add explicit MIME type for JavaScript files
+app.use('/js', (req, res, next) => {
+    res.type('application/javascript');
+    next();
+}, express.static('public/js'));

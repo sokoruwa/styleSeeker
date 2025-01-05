@@ -24,8 +24,8 @@ body::before {
     z-index: 1;
 }
 
-/* Login Header */
-.login-header {
+/* Chat Header */
+.chat-header {
     height: 200px;
     position: relative;
     display: flex;
@@ -35,7 +35,7 @@ body::before {
     margin-bottom: 60px;
 }
 
-.login-header h1 {
+.chat-header h1 {
     font-size: 60px;
     font-weight: 800;
     text-transform: uppercase;
@@ -56,135 +56,113 @@ body::before {
     80% { text-shadow: -4px 0 #B4436C, 4px 0 #F2C14E; }
 }
 
-/* Login Container */
-.login-container {
-    max-width: 500px;
+/* Chat Container */
+.chat-container {
+    max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
-}
-
-.login-box {
     background: rgba(0, 0, 0, 0.8);
     border: 3px solid #B4436C;
-    padding: 40px;
-    position: relative;
+    padding: 20px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
 }
 
-.login-box h2 {
-    color: #F2C14E;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-/* Form Styles */
-.input-group {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 10px 0;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid #B4436C;
-    color: #F2C14E;
-    font-family: "IBM Plex Mono", monospace;
-}
-
-.input-group label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px 0;
-    color: #B4436C;
-    pointer-events: none;
-    transition: 0.3s ease all;
-}
-
-.input-group input:focus,
-.input-group input:valid {
-    outline: none;
-    border-bottom-color: #F2C14E;
-}
-
-.input-group input:focus ~ label,
-.input-group input:valid ~ label {
-    top: -20px;
-    font-size: 12px;
-    color: #F2C14E;
-}
-
-/* Button Styles */
-.cyber-button {
-    background: #B4436C;
-    color: #111;
-    border: none;
-    padding: 15px 30px;
-    font-family: "IBM Plex Mono", monospace;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
-.cyber-button:hover {
+/* Message Styles */
+.message {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    max-width: 80%;
+    position: relative;
+}
+
+.user-message {
+    background: #B4436C;
+    color: #111;
+    margin-left: auto;
+    border-radius: 15px 15px 0 15px;
+}
+
+.bot-message {
+    background: rgba(242, 193, 78, 0.1);
+    color: #F2C14E;
+    margin-right: auto;
+    border-radius: 15px 15px 15px 0;
+    border: 1px solid #F2C14E;
+}
+
+/* Input Area */
+.chat-input-container {
+    padding: 20px;
+    border-top: 2px solid #B4436C;
+}
+
+#chatForm {
+    display: flex;
+    gap: 10px;
+}
+
+#userInput {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #B4436C;
+    padding: 15px;
+    color: #F2C14E;
+    font-family: "IBM Plex Mono", monospace;
+}
+
+#userInput:focus {
+    outline: none;
+    border-color: #F2C14E;
+}
+
+.send-button {
+    background: #B4436C;
+    color: #111;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.send-button:hover {
     background: #F2C14E;
     transform: translateY(-2px);
 }
 
-.cyber-button-secondary {
-    background: transparent;
-    color: #F2C14E;
-    border: 2px solid #B4436C;
-    padding: 12px 25px;
-    text-decoration: none;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: all 0.2s;
+/* Scrollbar */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
 }
 
-.cyber-button-secondary:hover {
+.chat-messages::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
     background: #B4436C;
-    color: #111;
-    text-decoration: none;
-}
-
-/* Create Account Link */
-.create-account-link {
-    text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(180, 67, 108, 0.2);
-}
-
-.create-account-link p {
-    margin-bottom: 15px;
-    color: #B4436C;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .login-header {
+    .chat-header {
         height: 150px;
     }
 
-    .login-header h1 {
+    .chat-header h1 {
         font-size: 2.5rem;
     }
 
-    .login-container {
-        padding: 10px;
-    }
-
-    .login-box {
-        padding: 20px;
+    .chat-container {
+        height: calc(100vh - 300px);
     }
 }
 
