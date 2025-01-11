@@ -51,18 +51,32 @@
         </div>
     </nav>
 
-    <div class="profile-header">
-        <h1>Profile</h1>
-    </div>
-
     <div class="container">
-        <div id="profileData">
-            <!-- Loading state will be replaced by profile data -->
-            <div class="loading-state">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        <div class="profile-header">
+            <h1>Your Style Profile</h1><span id="profileUsername">
+        </div>
+
+        <!-- Fit Calculator Results -->
+        <div class="cyber-box mt-4" id="fitResults">
+            <div class="cyber-box-header">
+                <h2><i class="fas fa-ruler"></i> Body Measurements & Analysis</h2>
+            </div>
+            <div class="cyber-box-content">
+                <div id="measurementsData">
+                    <!-- Will be populated by JavaScript -->
                 </div>
-                <p>LOADING PROFILE DATA...</p>
+            </div>
+        </div>
+
+        <!-- Style Quiz Results -->
+        <div class="cyber-box mt-4" id="styleResults">
+            <div class="cyber-box-header">
+                <h2><i class="fas fa-tshirt"></i> Style Preferences</h2>
+            </div>
+            <div class="cyber-box-content">
+                <div id="styleQuizData">
+                    <!-- Will be populated by JavaScript -->
+                </div>
             </div>
         </div>
     </div>

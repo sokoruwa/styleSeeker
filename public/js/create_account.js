@@ -6,70 +6,56 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         console.log('Form submitted');
 
-        // Get form elements
-        const username = document.getElementById('username');
-        const password = document.getElementById('password');
-        const email = document.getElementById('email');
-        const firstName = document.getElementById('firstName');
-        const lastName = document.getElementById('lastName');
+        // Get form values directly from the form
+        const formData = new FormData(form);
+        const username = formData.get('username');
+        const password = formData.get('password');
 
-        // Check if elements exist
-        if (!username || !password || !email || !firstName || !lastName) {
-            console.error('Form fields not found:', {
-                username: !!username,
-                password: !!password,
-                email: !!email,
-                firstName: !!firstName,
-                lastName: !!lastName
+        if (!username || !password) {
+            const errorDiv = document.getElementById('signupError');
+            if (errorDiv) {
+                errorDiv.textContent = 'Username and password are required';
+                errorDiv.style.display = 'block';
+            }
+            return;
+        }
+
+        try {
+            console.log('Sending signup request:', { username });
+
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
             });
-            alert('Form error: Missing fields');
-            return;
-        }
 
-        // Get values
-        const data = {
-            username: username.value.trim(),
-            password: password.value.trim(),
-            email: email.value.trim(),
-            firstName: firstName.value.trim(),
-            lastName: lastName.value.trim()
-        };
+            const data = await response.json();
 
-        // Validate values
-        if (!data.username || !data.password || !data.email || !data.firstName || !data.lastName) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        console.log('Sending account data:', {
-            ...data,
-            password: '****'
-        });
-
-        fetch('/api/create-account', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Account created successfully! Please log in.');
+            if (response.ok) {
                 window.location.href = '/login.html';
             } else {
-                throw new Error(data.message || 'Error creating account');
+                const errorDiv = document.getElementById('signupError');
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Error creating account';
+                    errorDiv.style.display = 'block';
+                }
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message);
-        });
+        } catch (error) {
+            console.error('Signup error:', error);
+            const errorDiv = document.getElementById('signupError');
+            if (errorDiv) {
+                errorDiv.textContent = 'An error occurred during signup';
+                errorDiv.style.display = 'block';
+            }
+        }
     });
 });

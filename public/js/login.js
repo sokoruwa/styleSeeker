@@ -1,79 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Login page loaded');
     const loginForm = document.getElementById('loginForm');
     
-    // Debug: Check if form exists
-    console.log('Login form found:', !!loginForm);
-    
-    // Debug: Check if inputs exist - use more specific selectors
-    const usernameInput = document.querySelector('#loginForm #username');
-    const passwordInput = document.querySelector('#loginForm #password');
-    console.log('Form elements found:', {
-        username: !!usernameInput,
-        password: !!passwordInput
-    });
-
     if (!loginForm) {
         console.error('Login form not found');
         return;
     }
 
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         console.log('Login form submitted');
 
-        // Get form elements again inside the handler - use more specific selectors
-        const usernameInput = document.querySelector('#loginForm #username');
-        const passwordInput = document.querySelector('#loginForm #password');
+        // Get form data
+        const formData = new FormData(this);
+        const username = formData.get('username');
+        const password = formData.get('password');
 
-        // Debug: Log the actual elements
-        console.log('Form elements on submit:', {
-            usernameElement: usernameInput,
-            passwordElement: passwordInput
-        });
-
-        if (!usernameInput || !passwordInput) {
-            console.error('Form fields not found on submit');
-            alert('Form error: Missing fields');
-            return;
-        }
-
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        // Debug: Log the values (password redacted)
-        console.log('Form values:', {
-            username,
-            password: password ? '***' : 'empty'
+        console.log('Form data collected:', { 
+            username: username ? 'exists' : 'missing',
+            password: password ? 'exists' : 'missing'
         });
 
         if (!username || !password) {
-            alert('Please enter both username and password');
+            showError('Username and password are required');
             return;
         }
 
-        fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            });
+
+            const data = await response.json();
             console.log('Login response:', data);
+
             if (data.success) {
                 console.log('Login successful:', data);
-                updateUIBasedOnLoginStatus(true, data.username);
-                window.location.href = '/fit_calculator.html';
+                window.location.href = '/';
             } else {
-                throw new Error(data.message || 'Login failed');
+                showError(data.message || 'Login failed');
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Login error:', error);
-            alert(error.message);
-        });
+            showError('An error occurred during login');
+        }
     });
+
+    function showError(message) {
+        let errorDiv = document.getElementById('loginError');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = 'loginError';
+            errorDiv.className = 'alert alert-danger mt-3';
+            loginForm.insertBefore(errorDiv, loginForm.firstChild);
+        }
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
 });

@@ -183,3 +183,32 @@ body::before {
 .navbar-nav .nav-link.active {
     color: #B4436C !important;
 }
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 10px;
+}
+
+.option-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 15px;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid #00ff9d;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    background: rgba(0, 255, 157, 0.2);
+    transform: translateX(5px);
+}
+
+.option-btn span {
+    display: block;
+    padding: 5px;
+}

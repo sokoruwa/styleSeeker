@@ -21,6 +21,7 @@ const session = require('express-session');
 const path = require('path');
 const mongoose = require('mongoose');
 const User = require('./models/User'); // Add this line
+const Measurement = require('./models/Measurement');
 
 // Add SECRET_KEY and users array
 const SECRET_KEY = 'your_secret_key'; // In a real app, use an environment variable
@@ -46,8 +47,8 @@ connectToMongo();
 // Session configuration
 app.use(session({
     secret: 'your-secret-key',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
         secure: false,
         httpOnly: true,
@@ -72,6 +73,35 @@ app.use(cors({
 app.use((req, res, next) => {
     console.log('Session ID:', req.sessionID);
     console.log('Session data:', req.session);
+    next();
+});
+
+// Add this after your middleware but before any routes
+app.use((req, res, next) => {
+    console.log('Incoming request:', req.method, req.path);
+    console.log('Session:', req.session);
+    next();
+});
+
+// Add these test routes FIRST
+app.get('/test', (req, res) => {
+    res.json({ message: 'Basic route works' });
+});
+
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API route works' });
+});
+
+app.get('/api/style-preferences', (req, res) => {
+    console.log('Style route hit');
+    res.json({ message: 'Style route works' });
+});
+
+// Your existing debug middleware
+app.use((req, res, next) => {
+    console.log('Request URL:', req.url);
+    console.log('Request Method:', req.method);
+    console.log('Session:', req.session);
     next();
 });
 
@@ -103,7 +133,6 @@ app.post('/api/login', async (req, res) => {
     console.log('Login attempt for:', username);
 
     try {
-        // Find user and log the result
         const user = await User.findOne({ username });
         console.log('Found user:', user);
 
@@ -120,21 +149,18 @@ app.post('/api/login', async (req, res) => {
 
         // Set session data
         req.session.userId = user._id;
-        req.session.username = user.username;  // Use user.username from database
+        req.session.username = username;
         req.session.isLoggedIn = true;
 
         // Log session data
-        console.log('Session after login:', {
-            userId: req.session.userId,
-            username: req.session.username,
-            isLoggedIn: req.session.isLoggedIn
-        });
+        console.log('Session after login:', req.session);
 
+        // Save session explicitly
         await new Promise((resolve) => req.session.save(resolve));
 
         res.json({
             success: true,
-            username: user.username,
+            username: username,
             message: 'Login successful'
         });
     } catch (error) {
@@ -300,10 +326,10 @@ app.get('/api/user-profile', async (req, res) => {
 });
 
 app.listen(3000, function () {
-    console.log("server started at 3000");
-    // const rawData=fs.readFileSync(__dirname+"/public/data/data10.json");
-    // carList=JSON.parse(rawData);
-    // console.log(carList);
+    console.log("Server started at http://localhost:3000");
+    console.log("Available endpoints:");
+    console.log("- POST /api/measurements");
+    console.log("- GET /api/measurements");
 });
 
 // Error handling middleware
@@ -348,3 +374,521 @@ app.use('/js', (req, res, next) => {
     res.type('application/javascript');
     next();
 }, express.static('public/js'));
+
+app.post('/api/signup', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        console.log("Signup request received:", { username });
+        
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Username and password are required' });
+        }
+
+        // Check if username already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            console.log("Username already exists:", username);
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user without email field
+        const user = new User({
+            username: username,
+            password: hashedPassword
+        });
+
+        await user.save();
+        console.log("User created successfully:", username);
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        console.error('Signup error:', error);
+        res.status(500).json({ 
+            message: 'Error creating user', 
+            error: error.message 
+        });
+    }
+});
+
+// Add this with your other routes
+app.post('/api/save-aesthetic', async (req, res) => {
+    if (!req.session || !req.session.isLoggedIn) {
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        const { aesthetic, description } = req.body;
+        const userId = req.session.userId;
+
+        await User.findByIdAndUpdate(userId, {
+            $set: {
+                aesthetic: aesthetic,
+                aestheticDescription: description,
+                aestheticDate: new Date()
+            }
+        });
+
+        res.json({ message: 'Aesthetic saved successfully' });
+    } catch (error) {
+        console.error('Error saving aesthetic:', error);
+        res.status(500).json({ message: 'Failed to save aesthetic' });
+    }
+});
+
+// Add this with your other routes
+app.get('/api/profile', (req, res) => {
+    if (!req.session || !req.session.isLoggedIn) {
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    User.findById(req.session.userId)
+        .select('-password') // Exclude password from the response
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.json(user);
+        })
+        .catch(error => {
+            console.error('Error fetching profile:', error);
+            res.status(500).json({ message: 'Error fetching profile' });
+        });
+});
+
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log('Request URL:', req.url);
+    console.log('Request Method:', req.method);
+    console.log('Session:', req.session);
+    next();
+});
+
+// Measurements endpoints
+app.post('/api/measurements', async (req, res) => {
+    console.log('Received measurements request');
+    console.log('Session:', req.session);
+    console.log('Body:', req.body);
+
+    if (!req.session || !req.session.isLoggedIn) {
+        console.log('User not authenticated');
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        // Find the existing user by ID
+        const userId = req.session.userId;
+        console.log('Looking for user with ID:', userId);
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { 
+                $set: { 
+                    measurements: {
+                        bust: req.body.bust,
+                        waist: req.body.waist,
+                        hips: req.body.hips
+                    }
+                }
+            },
+            { new: true, runValidators: false }  // Return updated document
+        );
+
+        console.log('Update result:', result);
+
+        if (!result) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await result.save();
+        console.log('Measurements saved:', result);
+
+        res.json({ 
+            message: `Measurements saved successfully. <a href="/profile_page.html" class="alert-link">View your profile</a> to see your measurements.`,
+            measurements: result.measurements
+        });
+
+    } catch (error) {
+        console.error('Error saving measurements:', error);
+        res.status(500).json({ 
+            message: 'Error saving measurements',
+            error: error.message 
+        });
+    }
+});
+
+app.get('/api/measurements', async (req, res) => {
+    if (!req.session || !req.session.isLoggedIn) {
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Add some console.logs for debugging
+        console.log('Fetching measurements for user:', user.username);
+        console.log('Measurements data:', user.measurements);
+
+        res.json({
+            measurements: user.measurements,
+            username: user.username
+        });
+    } catch (error) {
+        console.error('Error fetching measurements:', error);
+        res.status(500).json({ message: 'Failed to fetch measurements' });
+    }
+});
+
+app.get('/api/test-style', async (req, res) => {
+    console.log('Test style route hit');
+    if (!req.session || !req.session.isLoggedIn) {
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ message: 'Test style route works' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/check-auth', (req, res) => {
+    console.log('Checking auth status. Session:', req.session);
+    
+    if (req.session && req.session.isLoggedIn) {
+        res.json({
+            isLoggedIn: true,
+            username: req.session.username
+        });
+    } else {
+        res.json({
+            isLoggedIn: false
+        });
+    }
+});
+
+// Make sure these routes are BEFORE app.use(express.static('public'))
+
+// Test route to verify API is working
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working' });
+});
+
+// Style preferences route
+app.get('/api/style-preferences', (req, res) => {
+    console.log('Style preferences route hit - TEST');
+    res.json({ message: 'Style preferences route working' });
+});
+
+// Save style preferences route
+app.post('/api/save-style-preferences', async (req, res) => {
+    try {
+        if (!req.session || !req.session.userId) {
+            return res.status(401).json({ message: 'Please log in' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.stylePreferences = {
+            primaryStyle: req.body.primaryStyle,
+            secondaryStyle: req.body.secondaryStyle,
+            recommendations: req.body.recommendations,
+            keyPieces: req.body.keyPieces,
+            updatedAt: new Date()
+        };
+
+        await user.save();
+        res.json({
+            message: 'Style preferences saved successfully',
+            preferences: user.stylePreferences
+        });
+
+    } catch (error) {
+        console.error('Error saving preferences:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Then your static files
+app.use(express.static('public'));
+
+// Debug route to list all registered routes
+app.get('/debug/routes', (req, res) => {
+    const routes = [];
+    app._router.stack.forEach(middleware => {
+        if (middleware.route) {
+            routes.push({
+                path: middleware.route.path,
+                methods: Object.keys(middleware.route.methods)
+            });
+        }
+    });
+    res.json(routes);
+});
+
+// Update MongoDB connection with better error handling
+mongoose.connect('mongodb://127.0.0.1:27017/styleSeeker', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000 // 5 second timeout
+})
+.then(() => {
+    console.log('Successfully connected to MongoDB.');
+})
+.catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit if we can't connect to database
+});
+
+// Add connection error handler
+mongoose.connection.on('error', err => {
+    console.error('MongoDB connection error:', err);
+});
+
+// Add connection success handler
+mongoose.connection.once('open', () => {
+    console.log('MongoDB connection is open');
+});
+
+// Add disconnection handler
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
+
+// API Routes - all in one place
+const apiRoutes = {
+    // Measurements routes
+    getMeasurements: app.get('/api/measurements', async (req, res) => {
+        if (!req.session || !req.session.isLoggedIn) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+
+        try {
+            const user = await User.findById(req.session.userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            console.log('Fetching measurements for user:', user.username);
+            console.log('Measurements data:', user.measurements);
+
+            res.json({
+                measurements: user.measurements,
+                username: user.username
+            });
+        } catch (error) {
+            console.error('Error fetching measurements:', error);
+            res.status(500).json({ message: 'Failed to fetch measurements' });
+        }
+    }),
+
+    // Style preferences routes
+    getStylePreferences: app.get('/api/style-preferences', async (req, res) => {
+        console.log('Style preferences route hit');
+        if (!req.session || !req.session.isLoggedIn) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+
+        try {
+            const user = await User.findById(req.session.userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            console.log('Fetching style preferences for user:', user.username);
+            res.json({
+                preferences: user.stylePreferences || null
+            });
+        } catch (error) {
+            console.error('Error fetching style preferences:', error);
+            res.status(500).json({ message: 'Failed to fetch style preferences' });
+        }
+    }),
+
+    saveStylePreferences: app.post('/api/save-style-preferences', async (req, res) => {
+        if (!req.session || !req.session.isLoggedIn) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+
+        try {
+            const user = await User.findById(req.session.userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            user.stylePreferences = {
+                primaryStyle: req.body.primaryStyle,
+                secondaryStyle: req.body.secondaryStyle,
+                recommendations: req.body.recommendations,
+                keyPieces: req.body.keyPieces,
+                updatedAt: new Date()
+            };
+
+            await user.save();
+            console.log('Style preferences saved for user:', user.username);
+
+            res.json({
+                message: 'Style preferences saved successfully',
+                preferences: user.stylePreferences
+            });
+        } catch (error) {
+            console.error('Error saving style preferences:', error);
+            res.status(500).json({ message: 'Failed to save style preferences' });
+        }
+    })
+};
+
+// Debug route to verify API is working
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working' });
+});
+
+// Static files AFTER all API routes
+app.use(express.static('public'));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something broke!' });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    // Log all registered routes
+    console.log('\nRegistered routes:');
+    app._router.stack.forEach(r => {
+        if (r.route && r.route.path) {
+            console.log(`${Object.keys(r.route.methods).join(',')} ${r.route.path}`);
+        }
+    });
+});
+
+app.get('/api/test-route', (req, res) => {
+    console.log('Test route hit');
+    res.json({ message: 'Test route working' });
+});
+
+// Style preferences endpoints
+app.get('/api/style-preferences', async (req, res) => {
+    console.log('Received style preferences request');
+    console.log('Session:', req.session);
+
+    if (!req.session || !req.session.isLoggedIn) {
+        console.log('User not authenticated');
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Add some console.logs for debugging
+        console.log('Fetching style preferences for user:', user.username);
+        console.log('Style preferences data:', user.stylePreferences);
+
+        res.json({
+            preferences: user.stylePreferences || null
+        });
+    } catch (error) {
+        console.error('Error fetching style preferences:', error);
+        res.status(500).json({ message: 'Failed to fetch style preferences' });
+    }
+});
+
+app.post('/api/save-style-preferences', async (req, res) => {
+    console.log('Received save style preferences request');
+    console.log('Session:', req.session);
+    console.log('Body:', req.body);
+
+    if (!req.session || !req.session.isLoggedIn) {
+        console.log('User not authenticated');
+        return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+        const userId = req.session.userId;
+        console.log('Looking for user with ID:', userId);
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { 
+                $set: { 
+                    stylePreferences: {
+                        primaryStyle: req.body.primaryStyle,
+                        secondaryStyle: req.body.secondaryStyle,
+                        recommendations: req.body.recommendations,
+                        keyPieces: req.body.keyPieces,
+                        updatedAt: new Date()
+                    }
+                }
+            },
+            { new: true, runValidators: false }
+        );
+
+        console.log('Update result:', result);
+
+        if (!result) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await result.save();
+        console.log('Style preferences saved:', result.stylePreferences);
+
+        res.json({ 
+            message: 'Style preferences saved successfully',
+            preferences: result.stylePreferences
+        });
+
+    } catch (error) {
+        console.error('Error saving style preferences:', error);
+        res.status(500).json({ 
+            message: 'Error saving style preferences',
+            error: error.message 
+        });
+    }
+});
+
+// Keep this logging middleware at the top of your routes
+app.use((req, res, next) => {
+    console.log('Request received:', {
+        method: req.method,
+        path: req.path,
+        url: req.url
+    });
+    next();
+});

@@ -6,47 +6,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', handleFormSubmit);
 
-    async function handleFormSubmit(e) {
-        e.preventDefault();
-
-        // Get form values
-        const heightFeet = parseInt(document.getElementById('heightFeet').value) || 0;
-        const heightInches = parseInt(document.getElementById('heightInches').value) || 0;
-        const bust = parseInt(document.getElementById('bust').value) || 0;
-        const waist = parseInt(document.getElementById('waist').value) || 0;
-        const hips = parseInt(document.getElementById('hips').value) || 0;
-        const hipDips = document.getElementById('hipDips').checked;
-
-        // Calculate results
-        const results = calculateBodyType(heightFeet, heightInches, bust, waist, hips, hipDips);
+    async function handleFormSubmit(event) {
+        event.preventDefault();
         
-        // Display results
-        displayResults(results);
+        const fields = ['bust', 'waist', 'hips'];
+        const measurements = {};
+        
+        for (const field of fields) {
+            const element = document.getElementById(field);
+            if (!element) {
+                console.error(`Field ${field} not found in the form`);
+                return;
+            }
+            measurements[field] = parseFloat(element.value) || 0;
+        }
 
-        // Check login status and show appropriate message
+        // Calculate body type
+        const bodyTypeResult = calculateBodyType(measurements);
+        
+        // Show results to everyone
+        displayResults(bodyTypeResult);
+
+        // Check login status
         const loginStatus = await checkLoginStatus();
-        if (!loginStatus.isLoggedIn) {
-            // Add login prompt to results
-            const loginPrompt = document.createElement('div');
-            loginPrompt.className = 'alert alert-info';
-            loginPrompt.innerHTML = `
-                <p>Want to save your results and get personalized style recommendations?</p>
-                <a href="login.html" class="alert-link">Log in</a> or 
-                <a href="login.html#signup" class="alert-link">create an account</a>!
-            `;
-            outputBox.appendChild(loginPrompt);
+        
+        if (loginStatus.isLoggedIn) {
+            // If logged in, save measurements
+            try {
+                await saveMeasurements(measurements);
+                showSuccessMessage('Measurements saved successfully. <a href="/profile_page.html" class="alert-link">View your profile</a> to see your measurements.');
+            } catch (error) {
+                showErrorMessage('Error saving measurements. Please try again.');
+            }
         } else {
-            // Save measurements to profile if logged in
-            saveMeasurements(heightFeet, heightInches, bust, waist, hips, hipDips);
+            // If not logged in, show login prompt below results
+            showLoginPrompt();
         }
     }
 
-    function calculateBodyType(heightFeet, heightInches, bust, waist, hips, hipDips) {
-        // Your existing calculation logic here
-        const totalHeightInches = (heightFeet * 12) + heightInches;
+    function calculateBodyType(measurements) {
+        const { bust, waist, hips } = measurements;
         
-        // Add your body type calculation logic here
-        // This is a simplified example
         let bodyType = "";
         if (hips - waist >= 10 && bust - waist >= 8) {
             bodyType = "Hourglass";
@@ -60,69 +60,168 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return {
             bodyType: bodyType,
-            measurements: {
-                height: `${heightFeet}'${heightInches}"`,
-                bust: bust,
-                waist: waist,
-                hips: hips,
-                hipDips: hipDips
-            }
+            measurements: measurements
         };
     }
 
     function displayResults(results) {
-        // Show the output box
-        outputBox.style.display = 'block';
+        // Get elements
+        const form = document.getElementById('measurementForm');
+        const resultsContainer = document.getElementById('resultsContainer');
+        
+        // Create results HTML
+        resultsContainer.innerHTML = `
+            <div class="cyber-box mt-4">
+                <div class="cyber-box-header">
+                    <h2><i class="fas fa-robot"></i> Analysis Complete</h2>
+                </div>
+                <div class="cyber-box-content">
+                    <div class="body-type-section">
+                        <div class="cyber-highlight">
+                            <h3><i class="fas fa-dna"></i> Body Type Identified: ${results.bodyType}</h3>
+                        </div>
+                        <div class="measurements-grid mt-3">
+                            <h4><i class="fas fa-ruler"></i> Measurements:</h4>
+                            <div class="cyber-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Bust</span>
+                                    <span class="stat-value">${results.measurements.bust}"</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Waist</span>
+                                    <span class="stat-value">${results.measurements.waist}"</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Hips</span>
+                                    <span class="stat-value">${results.measurements.hips}"</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        // Display body type result
-        bodyTypeResult.innerHTML = `
-            <h2>Your Body Type: ${results.bodyType}</h2>
-            <p>Height: ${results.measurements.height}</p>
-            <p>Measurements: ${results.measurements.bust}-${results.measurements.waist}-${results.measurements.hips}</p>
+                    <div class="recommendations mt-4">
+                        <h4><i class="fas fa-tshirt"></i> Style Matrix for ${results.bodyType} Configuration:</h4>
+                        <div class="cyber-recommendations">
+                            ${getRecommendations(results.bodyType)}
+                        </div>
+                    </div>
+
+                    <button class="cyber-button mt-4" onclick="location.reload()">
+                        <span><i class="fas fa-sync"></i> New Analysis</span>
+                    </button>
+                </div>
+            </div>
         `;
 
-        // Display outfit recommendations
-        outfitDisplay.innerHTML = `
-            <h3>Style Recommendations for ${results.bodyType} Body Type:</h3>
-            ${getRecommendations(results.bodyType)}
-        `;
+        // Show results
+        resultsContainer.style.display = 'block';
     }
 
     function getRecommendations(bodyType) {
-        // Add your recommendation logic here
         const recommendations = {
-            Hourglass: "Fitted dresses, wrap styles, belted pieces that accentuate your waist",
-            Pear: "A-line skirts, boat neck tops, statement shoulders to balance proportions",
-            Apple: "Empire waist dresses, V-necks, flowy bottoms to create balance",
-            Rectangle: "Ruffles, layers, peplum tops to create curves and definition"
+            Hourglass: `
+                <ul>
+                    <li>Fitted dresses that accentuate your waist</li>
+                    <li>Wrap dresses and tops</li>
+                    <li>Belt your outfits to highlight your waist</li>
+                    <li>Form-fitting clothing that follows your curves</li>
+                </ul>`,
+            Pear: `
+                <ul>
+                    <li>A-line skirts and dresses</li>
+                    <li>Boat neck and wide-neck tops to balance proportions</li>
+                    <li>Statement tops with detail around shoulders</li>
+                    <li>Dark colors on bottom, bright colors on top</li>
+                </ul>`,
+            Apple: `
+                <ul>
+                    <li>Empire waist dresses</li>
+                    <li>V-neck tops to elongate torso</li>
+                    <li>Flowy bottoms to create balance</li>
+                    <li>Structured jackets that hit at the hip</li>
+                </ul>`,
+            Rectangle: `
+                <ul>
+                    <li>Peplum tops to create curves</li>
+                    <li>Layered clothing to add dimension</li>
+                    <li>Belt at the waist to create definition</li>
+                    <li>Ruffles and gathered details to add curves</li>
+                </ul>`
         };
 
-        return `<p>${recommendations[bodyType]}</p>`;
+        return recommendations[bodyType] || '<p>No specific recommendations available.</p>';
     }
 
-    async function saveMeasurements(heightFeet, heightInches, bust, waist, hips, hipDips) {
+    function showLoginPrompt() {
+        const loginPrompt = document.createElement('div');
+        loginPrompt.className = 'alert alert-info mt-3';
+        loginPrompt.innerHTML = `
+            <p>Want to save your measurements and get personalized recommendations? 
+               <a href="/login.html">Login</a> or 
+               <a href="/signup.html">create an account</a>.</p>
+        `;
+        document.querySelector('.card').appendChild(loginPrompt);
+    }
+
+    async function saveMeasurements(measurements) {
         try {
+            console.log('Sending measurements:', measurements); // Debug log
+            
             const response = await fetch('/api/measurements', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    heightFeet,
-                    heightInches,
-                    bust,
-                    waist,
-                    hips,
-                    hipDips
-                })
+                body: JSON.stringify(measurements)
             });
 
+            console.log('Response status:', response.status); // Debug log
+
             if (!response.ok) {
-                throw new Error('Failed to save measurements');
+                const errorData = await response.json();
+                console.error('Server error:', errorData); // Debug log
+                throw new Error(errorData.message || 'Failed to save measurements');
             }
 
+            const data = await response.json();
+            console.log('Save successful:', data); // Debug log
+            return data;
         } catch (error) {
             console.error('Error saving measurements:', error);
+            throw new Error('Failed to save measurements');
+        }
+    }
+
+    // Add event listener when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('measurementForm');
+        if (form) {
+            form.addEventListener('submit', handleFormSubmit);
+        }
+
+        // Load existing measurements if available
+        loadExistingMeasurements();
+    });
+
+    async function loadExistingMeasurements() {
+        try {
+            const response = await fetch('/api/measurements');
+            if (!response.ok) {
+                throw new Error('Failed to fetch measurements');
+            }
+
+            const measurements = await response.json();
+            if (measurements) {
+                // Fill in the form with existing measurements
+                document.getElementById('bust').value = measurements.bust || '';
+                document.getElementById('waist').value = measurements.waist || '';
+                document.getElementById('hips').value = measurements.hips || '';
+                document.getElementById('inseam').value = measurements.inseam || '';
+                document.getElementById('shoulder').value = measurements.shoulder || '';
+                document.getElementById('armLength').value = measurements.armLength || '';
+            }
+        } catch (error) {
+            console.error('Error loading measurements:', error);
         }
     }
 });
