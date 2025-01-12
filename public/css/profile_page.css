@@ -254,3 +254,63 @@ li:last-child {
     color: #fff;
     text-shadow: 0 0 8px #00ff9d;
 }
+
+/* Add these styles to your existing CSS */
+
+.cyber-box-section {
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #B4436C;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.measurements-grid,
+.style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.measurement-item,
+.style-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid rgba(180, 67, 108, 0.3);
+}
+
+.label {
+    color: #F2C14E;
+    font-weight: bold;
+}
+
+.value {
+    color: #fff;
+}
+
+.recommendations,
+.key-pieces {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 3px solid #B4436C;
+}
+
+.cyber-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background: #B4436C;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.cyber-button:hover {
+    background: #F2C14E;
+    color: #111;
+    transform: translateY(-2px);
+}

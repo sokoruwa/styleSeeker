@@ -297,31 +297,30 @@ app.post('/api/save-measurements', async (req, res) => {
 
 app.get('/api/user-profile', async (req, res) => {
     if (!req.session.userId) {
-        return res.status(401).json({ message: 'User not logged in' });
+        return res.status(401).json({ message: 'Not authenticated' });
     }
 
     try {
         const database = client.db("styleSeeker");
         const users = database.collection("users");
+        const userId = new ObjectId(req.session.userId);
 
-        const user = await users.findOne({ _id: new ObjectId(req.session.userId) });
+        const user = await users.findOne({ _id: userId });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Only send necessary data
-        const profileData = {
+        // Send all relevant user data
+        res.json({
             username: user.username,
             measurements: user.measurements || null,
             bodyType: user.bodyType || null,
-            outfit: user.outfit || null
-        };
-
-        res.status(200).json(profileData);
+            stylePreferences: user.stylePreferences || null
+        });
     } catch (error) {
         console.error('Error fetching user profile:', error);
-        res.status(500).json({ message: 'Error fetching user profile' });
+        res.status(500).json({ message: 'Error fetching profile data' });
     }
 });
 
