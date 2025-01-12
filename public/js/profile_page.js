@@ -2,152 +2,127 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         // Check login status
         const loginStatus = await checkLoginStatus();
-        console.log('Login status:', loginStatus);
-
         if (!loginStatus.isLoggedIn) {
             window.location.href = '/login.html';
             return;
         }
 
-        // Fetch measurements
-        console.log('Fetching measurements...');
-        const measurementsResponse = await fetch('/api/measurements', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json'
-            }
+        // Fetch all profile data
+        const response = await fetch('/api/user-profile', {
+            credentials: 'include'
         });
-        console.log('Measurements response:', measurementsResponse);
 
-        // Fetch style preferences
-        console.log('Fetching style preferences...');
-        const styleResponse = await fetch('/api/style-preferences', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        console.log('Style response:', styleResponse);
-
-        // Check responses
-        if (!measurementsResponse.ok) {
-            console.error('Measurements response not ok:', await measurementsResponse.text());
-            throw new Error(`Measurements HTTP error! status: ${measurementsResponse.status}`);
-        }
-        if (!styleResponse.ok) {
-            console.error('Style response not ok:', await styleResponse.text());
-            throw new Error(`Style HTTP error! status: ${styleResponse.status}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch profile data');
         }
 
-        const measurementsData = await measurementsResponse.json();
-        console.log('Measurements data:', measurementsData);
+        const userData = await response.json();
+        console.log('User data:', userData);
 
-        const styleData = await styleResponse.json();
-        console.log('Style data:', styleData);
+        // Display username
+        document.getElementById('profileUsername').textContent = 
+            `Welcome, ${userData.username}!`;
 
         // Display measurements if they exist
-        if (measurementsData && measurementsData.measurements) {
-            displayMeasurements(measurementsData.measurements);
+        if (userData.measurements) {
+            displayMeasurements(userData.measurements);
         } else {
             displayNoMeasurements();
         }
 
         // Display style preferences if they exist
-        if (styleData && styleData.preferences) {
-            displayStylePreferences(styleData.preferences);
+        if (userData.stylePreferences) {
+            displayStylePreferences(userData.stylePreferences);
         } else {
             displayNoStylePreferences();
         }
 
     } catch (error) {
-        console.error('Detailed error:', error);
-        // Display error message to user
-        document.getElementById('measurementsData').innerHTML = `
-            <div class="cyber-alert error">
-                <p>Error: ${error.message}</p>
-                <p>Please try refreshing the page. If the problem persists, contact support.</p>
-            </div>
-        `;
-        document.getElementById('styleQuizData').innerHTML = `
-            <div class="cyber-alert error">
-                <p>Error: ${error.message}</p>
-                <p>Please try refreshing the page. If the problem persists, contact support.</p>
-            </div>
-        `;
+        console.error('Error:', error);
+        displayError(error.message);
     }
 });
 
 function displayMeasurements(measurements) {
     const measurementsContainer = document.getElementById('measurementsData');
     const bodyType = calculateBodyType(measurements);
-    console.log('Calculated body type:', bodyType);
 
     measurementsContainer.innerHTML = `
-        <div class="cyber-highlight">
-            <h3><i class="fas fa-dna"></i> Body Type: ${bodyType}</h3>
-        </div>
-        <div class="measurements-grid mt-3">
-            <div class="cyber-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Bust</span>
-                    <span class="stat-value">${measurements.bust}"</span>
+        <div class="cyber-box-section">
+            <h3>Body Measurements</h3>
+            <div class="measurements-grid">
+                <div class="measurement-item">
+                    <span class="label">Bust:</span>
+                    <span class="value">${measurements.bust}"</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Waist</span>
-                    <span class="stat-value">${measurements.waist}"</span>
+                <div class="measurement-item">
+                    <span class="label">Waist:</span>
+                    <span class="value">${measurements.waist}"</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Hips</span>
-                    <span class="stat-value">${measurements.hips}"</span>
+                <div class="measurement-item">
+                    <span class="label">Hips:</span>
+                    <span class="value">${measurements.hips}"</span>
                 </div>
             </div>
-        </div>
-        <div class="recommendations mt-4">
-            <h4><i class="fas fa-tshirt"></i> Style Recommendations:</h4>
-            <div class="cyber-recommendations">
-                ${getRecommendations(bodyType)}
+            
+            <div class="body-type-section">
+                <h3>Body Type: ${bodyType}</h3>
+                <div class="recommendations">
+                    ${getRecommendations(bodyType)}
+                </div>
             </div>
+            
+            <a href="/fit_calculator.html" class="cyber-button">
+                <span>Update Measurements</span>
+            </a>
+        </div>
+    `;
+}
+
+function displayStylePreferences(preferences) {
+    const styleContainer = document.getElementById('styleQuizData');
+    styleContainer.innerHTML = `
+        <div class="cyber-box-section">
+            <h3>Style Profile</h3>
+            <div class="style-grid">
+                <div class="style-item">
+                    <span class="label">Primary Style:</span>
+                    <span class="value">${preferences.primaryStyle}</span>
+                </div>
+                <div class="style-item">
+                    <span class="label">Secondary Style:</span>
+                    <span class="value">${preferences.secondaryStyle}</span>
+                </div>
+            </div>
+            
+            <div class="recommendations-section">
+                <h3>Style Recommendations</h3>
+                <div class="recommendations">
+                    ${preferences.recommendations || 'No recommendations available'}
+                </div>
+            </div>
+            
+            <div class="key-pieces-section">
+                <h3>Key Pieces</h3>
+                <div class="key-pieces">
+                    ${preferences.keyPieces || 'No key pieces defined'}
+                </div>
+            </div>
+            
+            <a href="/chat_bot.html" class="cyber-button">
+                <span>Update Style Profile</span>
+            </a>
         </div>
     `;
 }
 
 function displayNoMeasurements() {
     document.getElementById('measurementsData').innerHTML = `
-        <div class="cyber-alert">
-            <p>No measurements saved yet. 
-               <a href="/fit_calculator.html" class="cyber-link">Take the Fit Calculator</a> 
-               to get personalized recommendations!</p>
-        </div>
-    `;
-}
-
-function displayStylePreferences(preferences) {
-    if (!preferences) {
-        displayNoStylePreferences();
-        return;
-    }
-
-    const styleContainer = document.getElementById('styleQuizData');
-    styleContainer.innerHTML = `
-        <div class="style-preferences cyber-box">
-            <div class="preference-item">
-                <h4>Primary Style</h4>
-                <p>${preferences.primaryStyle || 'Not set'}</p>
-            </div>
-            <div class="preference-item">
-                <h4>Secondary Style</h4>
-                <p>${preferences.secondaryStyle || 'Not set'}</p>
-            </div>
-            <div class="preference-item">
-                <h4>Style Recommendations</h4>
-                <p>${preferences.recommendations || 'No recommendations yet'}</p>
-            </div>
-            <div class="preference-item">
-                <h4>Key Pieces</h4>
-                <p>${preferences.keyPieces || 'No key pieces defined'}</p>
-            </div>
+        <div class="cyber-alert info">
+            <p>No measurements saved yet.</p>
+            <a href="/fit_calculator.html" class="cyber-button">
+                <span>Take the Fit Calculator</span>
+            </a>
         </div>
     `;
 }
@@ -155,11 +130,24 @@ function displayStylePreferences(preferences) {
 function displayNoStylePreferences() {
     document.getElementById('styleQuizData').innerHTML = `
         <div class="cyber-alert info">
-            <p>You haven't taken the style quiz yet! 
-               <a href="/chat_bot.html" class="cyber-link">Chat with StyleBot</a> 
-               to discover your personal style.</p>
+            <p>No style preferences saved yet.</p>
+            <a href="/chat_bot.html" class="cyber-button">
+                <span>Take the Style Quiz</span>
+            </a>
         </div>
     `;
+}
+
+function displayError(message) {
+    const errorHtml = `
+        <div class="cyber-alert error">
+            <p>Error: ${message}</p>
+            <p>Please try refreshing the page. If the problem persists, contact support.</p>
+        </div>
+    `;
+    
+    document.getElementById('measurementsData').innerHTML = errorHtml;
+    document.getElementById('styleQuizData').innerHTML = errorHtml;
 }
 
 // Reuse these functions from fit_calculator.js
