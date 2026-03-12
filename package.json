@@ -2,9 +2,11 @@
   "name": "styleSeeker",
   "version": "1.0.0",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "bcrypt": "^5.0.1",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
     "express": "^4.17.1",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",

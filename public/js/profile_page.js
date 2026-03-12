@@ -19,10 +19,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         const userData = await response.json();
         console.log('User data:', userData);
 
-        // Display username
-        document.getElementById('profileUsername').textContent = 
-            `Welcome, ${userData.username}!`;
-
         // Display measurements if they exist
         if (userData.measurements) {
             displayMeasurements(userData.measurements);

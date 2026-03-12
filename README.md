@@ -1,116 +1,159 @@
 # styleSeeker
-styleSeeker: An AI-powered fashion recommendation system. 
 
-Features: 
-• Personalized style suggestions 
-• Virtual wardrobe 
-• Outfit generation
-• E-commerce integration
-• Trend analysis 
+An AI-powered personal fashion assistant that helps users discover their style aesthetic through conversation. Features a real-time AI stylist (StyleAI) powered by Claude, body type analysis, and a style profile system with a focus on African-inspired aesthetics.
 
-Tech: 
-• Javascript,
-• Node.js
-• MongoDB
-• HTML
-• CSS   
+**Features:**
+- StyleAI — conversational AI stylist that learns your vibe and saves your style profile
+- Fit calculator — body measurement input with body type analysis
+- Style profile — saved measurements, body type, and aesthetic preferences
+- Account system with login/signup
 
+**Tech stack:** Node.js, Express, MongoDB, HTML/CSS, Bootstrap 5, Anthropic Claude API
 
-Revolutionizing personal style with AI. Contribute or try it out!
+---
 
-## Getting Started
+## Prerequisites
 
-Follow these instructions to set up and run the styleSeeker project on your local machine.
+Before you start, make sure you have the following installed:
 
-### Prerequisites
+- **Node.js v18+** (v16 will not work — the app requires native fetch)
+  - Check your version: `node --version`
+  - Install/upgrade via nvm: `nvm install 18 && nvm use 18`
+  - Or via Homebrew: `brew install node@18`
+- **MongoDB v7**
+  - Check if installed: `mongod --version`
+  - Install via Homebrew: `brew install mongodb-community`
+- **npm** (comes with Node)
+- **An Anthropic API key** — get one at [console.anthropic.com](https://console.anthropic.com)
 
-- Node.js (version 14.x or higher)
-- npm (version 6.x or higher)
-- MongoDB (version 4.4 or higher)
+---
 
-### Installation
+## Setup
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/styleSeeker.git
-   cd styleSeeker
-   ```
+### 1. Clone the repo
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Set up MongoDB:
-   - Ensure MongoDB is installed and running on your system.
-   - Create a new database for the project:
-     ```
-     mongo
-     use styleSeeker
-     exit
-     ```
-
-4. Configure environment variables:
-   - Create a `.env` file in the root directory of the project.
-   - Add the following variables (adjust as needed):
-     ```
-     PORT=3000
-     MONGODB_URI=mongodb://localhost:27017/styleSeeker
-     ```
-
-### Running the Project
-
-1. Start the MongoDB service (if not already running):
-   ```
-   sudo service mongod start  # On Linux
-   brew services start mongodb-community  # On macOS with Homebrew
-   ```
-
-2. Start the Node.js server:
-   ```
-   npm run dev
-   ```
-
-3. Open your browser and navigate to `http://localhost:3000` to view the application.
-
-### Additional Scripts
-
-- Build the project:
-  ```
-  npm run build
-  ```
-
-- Run tests:
-  ```
-  npm test
-  ```
-
-- Start in production mode:
-  ```
-  npm start
-  ```
-
-## Development
-
-For development, you might want to use nodemon to automatically restart the server when files change:
-
-```
-npm install nodemon --save-dev
+```bash
+git clone https://github.com/sokoruwa/styleSeeker.git
+cd styleSeeker
 ```
 
-Then add a script to your `package.json`:
+### 2. Install dependencies
 
-```json
-"scripts": {
-  "dev": "nodemon server.js"
-}
+```bash
+npm install
 ```
 
-Replace `server.js` with your main server file.
+### 3. Create your `.env` file
 
-## Database Management
+Create a file called `.env` in the project root (never commit this file):
 
-To manage your MongoDB database, you can use MongoDB Compass, a GUI tool for MongoDB:
+```
+PORT=4000
+MONGODB_URI=mongodb://localhost:27017/styleSeeker
+ANTHROPIC_API_KEY=your_api_key_here
+```
 
-1. Download and install [MongoDB Compass](https://www.mongodb.com/try/download/compass)
-2. Connect to your database using the connection string: `mongodb://localhost:27017/styleSeeker`
+Replace `your_api_key_here` with your actual Anthropic API key. See `.env.example` for reference.
+
+---
+
+## Running the App
+
+You need two things running: MongoDB and the Node server. Use two separate terminal windows.
+
+### Terminal 1 — Start MongoDB
+
+```bash
+mkdir -p ~/data/db
+mongod --dbpath ~/data/db
+```
+
+Leave this running. You should see `Waiting for connections` in the output.
+
+### Terminal 2 — Start the server
+
+```bash
+cd ~/Desktop/PERSONALPROJECTS/styleSeeker
+node server.js
+```
+
+You should see:
+```
+[dotenv] injecting env from .env
+Server running on port 4000
+```
+
+### Open the app
+
+Go to **http://localhost:4000** in your browser.
+
+> Note: Port 3000 may be used by another app on your machine. styleSeeker runs on port **4000**.
+
+---
+
+## Stopping the App
+
+**Stop the server:** Press `Ctrl + C` in Terminal 2
+
+**Stop MongoDB:** Press `Ctrl + C` in Terminal 1
+
+**Kill by port (if needed):**
+```bash
+lsof -ti:4000 | xargs kill   # kill server
+lsof -ti:27017 | xargs kill  # kill MongoDB
+```
+
+---
+
+## Pages
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:4000` | Home (retro TV landing page) |
+| `http://localhost:4000/login.html` | Login |
+| `http://localhost:4000/create_account.html` | Sign up |
+| `http://localhost:4000/fit_calculator.html` | Body measurement + body type analysis |
+| `http://localhost:4000/chat_bot.html` | StyleAI — AI stylist chat |
+| `http://localhost:4000/profile_page.html` | Your style profile (requires login) |
+
+---
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Port to run the server on (default: 4000) |
+| `MONGODB_URI` | MongoDB connection string |
+| `ANTHROPIC_API_KEY` | Your Anthropic API key for StyleAI |
+
+---
+
+## Troubleshooting
+
+**`fetch is not defined` error on startup**
+Your Node.js version is too old. Upgrade to v18+:
+```bash
+nvm install 18 && nvm use 18
+```
+
+**`Permission denied` on MongoDB socket**
+```bash
+sudo rm /tmp/mongodb-27017.sock
+mongod --dbpath ~/data/db
+```
+
+**`Permission denied` on MongoDB data directory**
+```bash
+sudo chown -R $(whoami) ~/data/db
+mongod --dbpath ~/data/db
+```
+
+**Port already in use**
+```bash
+lsof -ti:4000 | xargs kill
+```
+
+**StyleAI not responding**
+- Check your `ANTHROPIC_API_KEY` in `.env` is valid and not revoked
+- Check the server terminal for error messages
+- Make sure you have credits at [console.anthropic.com](https://console.anthropic.com)

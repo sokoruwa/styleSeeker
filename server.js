@@ -1,6 +1,10 @@
+require('dotenv').config();
 const express = require("express");
 const fs = require('fs')
+const Anthropic = require('@anthropic-ai/sdk');
 const app = express();
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // const mongoose = require('mongoose');
 
 const bodyParser = require('body-parser');
@@ -65,7 +69,7 @@ app.use((req, res, next) => {
 // Other middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your client's URL
+  origin: 'http://localhost:4000', // Replace with your client's URL
   credentials: true
 }));
 
@@ -322,13 +326,6 @@ app.get('/api/user-profile', async (req, res) => {
         console.error('Error fetching user profile:', error);
         res.status(500).json({ message: 'Error fetching profile data' });
     }
-});
-
-app.listen(3000, function () {
-    console.log("Server started at http://localhost:3000");
-    console.log("Available endpoints:");
-    console.log("- POST /api/measurements");
-    console.log("- GET /api/measurements");
 });
 
 // Error handling middleware
@@ -780,8 +777,152 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Something broke!' });
 });
 
+// AI Style Chat endpoint
+app.post('/api/chat', async (req, res) => {
+    const { messages } = req.body;
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const tools = [
+        {
+            name: 'get_user_profile',
+            description: "Get the current user's saved body measurements and style preferences",
+            input_schema: { type: 'object', properties: {}, required: [] }
+        },
+        {
+            name: 'save_style_preferences',
+            description: "Save the user's style aesthetic after determining it through conversation",
+            input_schema: {
+                type: 'object',
+                properties: {
+                    primaryStyle: { type: 'string', description: 'Primary style aesthetic (e.g., African Alté, Afrofuturism, Modern Ankara, Y2K, Minimalist, Streetwear)' },
+                    secondaryStyle: { type: 'string', description: 'Secondary style influence' },
+                    recommendations: { type: 'string', description: 'Personalized style recommendations' },
+                    keyPieces: { type: 'string', description: 'Key wardrobe pieces to build the look' }
+                },
+                required: ['primaryStyle', 'recommendations', 'keyPieces']
+            }
+        }
+    ];
+
+    try {
+        // Build user context for system prompt
+        let userContext = '';
+        if (req.session && req.session.userId) {
+            try {
+                const database = client.db("styleSeeker");
+                const usersCol = database.collection("users");
+                const userId = new ObjectId(req.session.userId);
+                const user = await usersCol.findOne({ _id: userId });
+                if (user) {
+                    userContext = `\n\nLogged-in user: ${user.username}`;
+                    if (user.measurements) {
+                        userContext += `\nMeasurements: bust ${user.measurements.bust}", waist ${user.measurements.waist}", hips ${user.measurements.hips}"`;
+                    }
+                    if (user.bodyType) userContext += `\nBody type: ${user.bodyType}`;
+                    if (user.stylePreferences?.primaryStyle) userContext += `\nCurrent style: ${user.stylePreferences.primaryStyle}`;
+                }
+            } catch (e) { /* continue without profile */ }
+        }
+
+        const systemPrompt = `You are StyleAI, a warm and knowledgeable personal fashion stylist for styleSeeker — a fashion app celebrating African aesthetics and diverse body types.
+
+Your role:
+- Have natural conversations to help users discover their personal style
+- Give personalized outfit recommendations based on body type and aesthetic preferences
+- Draw from these aesthetics: African Alté (modern African streetwear), Afrofuturism (futuristic African fashion), Modern Ankara (traditional African prints updated), Y2K (2000s revival), Minimalist (clean and simple), Streetwear (urban casual)
+- Be warm, encouraging, and body-positive
+- Ask thoughtful questions about their lifestyle, vibe, and personality
+- Give specific, actionable advice
+
+When you've learned enough to confidently determine someone's style, use save_style_preferences to save their results and let them know.
+If you need their measurements or saved data, use get_user_profile.
+${userContext}`;
+
+        const allMessages = [...messages];
+
+        // Agentic loop
+        while (true) {
+            const stream = anthropic.messages.stream({
+                model: 'claude-opus-4-6',
+                max_tokens: 1024,
+                system: systemPrompt,
+                tools,
+                messages: allMessages,
+            });
+
+            for await (const event of stream) {
+                if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                    res.write(`data: ${JSON.stringify({ type: 'text', text: event.delta.text })}\n\n`);
+                }
+            }
+
+            const finalMessage = await stream.finalMessage();
+
+            if (finalMessage.stop_reason === 'end_turn') {
+                res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+                break;
+            }
+
+            if (finalMessage.stop_reason === 'tool_use') {
+                allMessages.push({ role: 'assistant', content: finalMessage.content });
+
+                const toolResults = [];
+                for (const block of finalMessage.content.filter(b => b.type === 'tool_use')) {
+                    let result;
+
+                    if (block.name === 'get_user_profile') {
+                        if (req.session && req.session.userId) {
+                            const database = client.db("styleSeeker");
+                            const usersCol = database.collection("users");
+                            const userId = new ObjectId(req.session.userId);
+                            const user = await usersCol.findOne({ _id: userId });
+                            result = JSON.stringify({
+                                measurements: user?.measurements || null,
+                                bodyType: user?.bodyType || null,
+                                stylePreferences: user?.stylePreferences || null
+                            });
+                        } else {
+                            result = JSON.stringify({ error: 'No user logged in' });
+                        }
+                    } else if (block.name === 'save_style_preferences') {
+                        if (req.session && req.session.userId) {
+                            const database = client.db("styleSeeker");
+                            const usersCol = database.collection("users");
+                            const userId = new ObjectId(req.session.userId);
+                            await usersCol.updateOne(
+                                { _id: userId },
+                                { $set: { stylePreferences: { ...block.input, updatedAt: new Date() } } }
+                            );
+                            res.write(`data: ${JSON.stringify({ type: 'saved', preferences: block.input })}\n\n`);
+                            result = JSON.stringify({ success: true });
+                        } else {
+                            result = JSON.stringify({ error: 'User not logged in — cannot save' });
+                        }
+                    }
+
+                    toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result });
+                }
+
+                allMessages.push({ role: 'user', content: toolResults });
+            } else {
+                res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+                break;
+            }
+        }
+
+        res.end();
+    } catch (error) {
+        console.error('Chat error:', error);
+        res.write(`data: ${JSON.stringify({ type: 'error', message: 'Something went wrong. Please try again.' })}\n\n`);
+        res.end();
+    }
+});
+
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     // Log all registered routes
