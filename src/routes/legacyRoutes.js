@@ -1,8 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { ObjectId } = require('mongodb');
 const User = require('../../models/User');
-const { getDatabase } = require('../db/mongoClient');
 
 const router = express.Router();
 
@@ -25,9 +23,7 @@ router.post('/api/create-account', async (req, res) => {
     }
 
     try {
-        const database = getDatabase();
-        const users = database.collection('users');
-        const existingUser = await users.findOne({ $or: [{ username }, { email }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 
         if (existingUser) {
             return res.status(409).json({
@@ -37,16 +33,15 @@ router.post('/api/create-account', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await users.insertOne({
+        const user = await User.create({
             firstName,
             lastName,
             username,
             email,
-            password: hashedPassword,
-            createdAt: new Date()
+            password: hashedPassword
         });
 
-        console.log('User created successfully:', result.insertedId);
+        console.log('User created successfully:', user._id);
         res.status(200).json({
             success: true,
             message: 'Account created successfully'
@@ -71,11 +66,9 @@ router.post('/api/save-measurements', async (req, res) => {
 
     try {
         const { height, bust, waist, hips, hipDips, bodyType, outfit } = req.body;
-        const database = getDatabase();
-        const users = database.collection('users');
 
-        const result = await users.updateOne(
-            { _id: new ObjectId(req.session.userId) },
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
             {
                 $set: {
                     measurements: {
@@ -88,10 +81,11 @@ router.post('/api/save-measurements', async (req, res) => {
                     bodyType,
                     outfit
                 }
-            }
+            },
+            { new: true, runValidators: false }
         );
 
-        if (result.matchedCount === 1) {
+        if (user) {
             return res.status(200).json({ success: true, message: 'Measurements saved successfully' });
         }
 
@@ -104,9 +98,7 @@ router.post('/api/save-measurements', async (req, res) => {
 
 router.get('/api/check-user/:username', async (req, res) => {
     const { username } = req.params;
-    const database = getDatabase();
-    const users = database.collection('users');
-    const user = await users.findOne({ username });
+    const user = await User.findOne({ username }).select('username');
 
     if (user) {
         return res.json({ exists: true, user: { username: user.username, _id: user._id } });

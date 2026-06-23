@@ -10,11 +10,24 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    firstName: String,
+    lastName: String,
+    email: {
+        type: String,
+        sparse: true
+    },
     measurements: {
+        height: Number,
         bust: Number,
         waist: Number,
-        hips: Number
+        hips: Number,
+        hipDips: String
     },
+    bodyType: String,
+    outfit: String,
+    aesthetic: String,
+    aestheticDescription: String,
+    aestheticDate: Date,
     stylePreferences: {
         primaryStyle: String,
         secondaryStyle: String,
@@ -33,4 +46,4 @@ userSchema.methods.toJSON = function() {
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User; 
+module.exports = User;

@@ -1,7 +1,6 @@
 const Anthropic = require('@anthropic-ai/sdk');
-const { ObjectId } = require('mongodb');
 const config = require('../config');
-const { getDatabase } = require('../db/mongoClient');
+const User = require('../../models/User');
 const { searchEbayProducts } = require('./ebayService');
 const getFetch = require('./fetchCompat');
 
@@ -48,9 +47,7 @@ async function getCurrentUser(userId) {
         return null;
     }
 
-    const database = getDatabase();
-    const users = database.collection('users');
-    return users.findOne({ _id: new ObjectId(userId) });
+    return User.findById(userId).select('-password').lean();
 }
 
 async function buildSystemPrompt(userId) {
@@ -108,13 +105,18 @@ async function handleToolUse(block, userId, res) {
             return JSON.stringify({ error: 'User not logged in — cannot save' });
         }
 
-        const database = getDatabase();
-        const users = database.collection('users');
-        await users.updateOne(
-            { _id: new ObjectId(userId) },
-            { $set: { stylePreferences: { ...block.input, updatedAt: new Date() } } }
-        );
-        res.write(`data: ${JSON.stringify({ type: 'saved', preferences: block.input })}\n\n`);
+        const stylePreferences = { ...block.input, updatedAt: new Date() };
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $set: { stylePreferences } },
+            { new: true, runValidators: false }
+        ).select('stylePreferences');
+
+        if (!user) {
+            return JSON.stringify({ error: 'User not found' });
+        }
+
+        res.write(`data: ${JSON.stringify({ type: 'saved', preferences: user.stylePreferences })}\n\n`);
         return JSON.stringify({ success: true });
     }
 

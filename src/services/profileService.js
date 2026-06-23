@@ -1,10 +1,7 @@
-const { ObjectId } = require('mongodb');
-const { getDatabase } = require('../db/mongoClient');
+const User = require('../../models/User');
 
 async function getUserProfile(userId) {
-    const database = getDatabase();
-    const users = database.collection('users');
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const user = await User.findById(userId).select('-password').lean();
 
     if (!user) {
         return null;

@@ -1,15 +1,21 @@
 const User = require('../../models/User');
 
 async function saveMeasurements(userId, measurements) {
+    const savedMeasurements = {
+        height: measurements.height,
+        bust: measurements.bust,
+        waist: measurements.waist,
+        hips: measurements.hips,
+        hipDips: measurements.hipDips
+    };
+
     const result = await User.findByIdAndUpdate(
         userId,
         {
             $set: {
-                measurements: {
-                    bust: measurements.bust,
-                    waist: measurements.waist,
-                    hips: measurements.hips
-                }
+                measurements: savedMeasurements,
+                bodyType: measurements.bodyType,
+                outfit: measurements.outfit
             }
         },
         { new: true, runValidators: false }
@@ -19,7 +25,6 @@ async function saveMeasurements(userId, measurements) {
         return null;
     }
 
-    await result.save();
     return result.measurements;
 }
 
@@ -29,10 +34,7 @@ async function getMeasurements(userId) {
         return null;
     }
 
-    return {
-        measurements: user.measurements,
-        username: user.username
-    };
+    return user.measurements || null;
 }
 
 module.exports = {
