@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         const userData = await response.json();
-        console.log('User data:', userData);
 
         // Display measurements if they exist
         if (userData.measurements) {
@@ -26,11 +25,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             displayNoMeasurements();
         }
 
-        // Display style preferences if they exist
-        if (userData.stylePreferences) {
-            displayStylePreferences(userData.stylePreferences);
+        // Display style profile if it exists
+        if (userData.styleProfile) {
+            displayStyleProfile(userData.styleProfile);
         } else {
-            displayNoStylePreferences();
+            displayNoStyleProfile();
         }
 
     } catch (error) {
@@ -41,157 +40,203 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 function displayMeasurements(measurements) {
     const measurementsContainer = document.getElementById('measurementsData');
-    const bodyType = calculateBodyType(measurements);
+    const bodyType = window.StyleSeekerBodyLogic.calculateBodyType(measurements);
 
-    measurementsContainer.innerHTML = `
-        <div class="cyber-box-section">
-            <h3>Body Measurements</h3>
-            <div class="measurements-grid">
-                <div class="measurement-item">
-                    <span class="label">Bust:</span>
-                    <span class="value">${measurements.bust}"</span>
-                </div>
-                <div class="measurement-item">
-                    <span class="label">Waist:</span>
-                    <span class="value">${measurements.waist}"</span>
-                </div>
-                <div class="measurement-item">
-                    <span class="label">Hips:</span>
-                    <span class="value">${measurements.hips}"</span>
-                </div>
-            </div>
-            
-            <div class="body-type-section">
-                <h3>Body Type: ${bodyType}</h3>
-                <div class="recommendations">
-                    ${getRecommendations(bodyType)}
-                </div>
-            </div>
-            
-            <a href="/fit_calculator.html" class="cyber-button">
-                <span>Update Measurements</span>
-            </a>
-        </div>
-    `;
+    const section = createElement('div', 'cyber-box-section');
+    section.appendChild(createElement('h3', null, 'Body Measurements'));
+
+    const grid = createElement('div', 'measurements-grid');
+    grid.append(
+        createLabeledValue('measurement-item', 'Bust:', `${formatMeasurement(measurements.bust)}"`),
+        createLabeledValue('measurement-item', 'Waist:', `${formatMeasurement(measurements.waist)}"`),
+        createLabeledValue('measurement-item', 'Hips:', `${formatMeasurement(measurements.hips)}"`)
+    );
+    section.appendChild(grid);
+
+    const bodyTypeSection = createElement('div', 'body-type-section');
+    bodyTypeSection.appendChild(createElement('h3', null, `Body Type: ${bodyType}`));
+
+    const recommendations = createElement('div', 'recommendations');
+    recommendations.appendChild(getRecommendations(bodyType));
+    bodyTypeSection.appendChild(recommendations);
+    section.appendChild(bodyTypeSection);
+
+    section.appendChild(createButtonLink('/fit_calculator.html', 'Update Measurements'));
+    replaceChildren(measurementsContainer, section);
 }
 
-function displayStylePreferences(preferences) {
+function displayStyleProfile(profile) {
     const styleContainer = document.getElementById('styleQuizData');
-    styleContainer.innerHTML = `
-        <div class="cyber-box-section">
-            <h3>Style Profile</h3>
-            <div class="style-grid">
-                <div class="style-item">
-                    <span class="label">Primary Style:</span>
-                    <span class="value">${preferences.primaryStyle}</span>
-                </div>
-                <div class="style-item">
-                    <span class="label">Secondary Style:</span>
-                    <span class="value">${preferences.secondaryStyle}</span>
-                </div>
-            </div>
-            
-            <div class="recommendations-section">
-                <h3>Style Recommendations</h3>
-                <div class="recommendations">
-                    ${preferences.recommendations || 'No recommendations available'}
-                </div>
-            </div>
-            
-            <div class="key-pieces-section">
-                <h3>Key Pieces</h3>
-                <div class="key-pieces">
-                    ${preferences.keyPieces || 'No key pieces defined'}
-                </div>
-            </div>
-            
-            <a href="/chat_bot.html" class="cyber-button">
-                <span>Update Style Profile</span>
-            </a>
-        </div>
-    `;
+    const section = createElement('div', 'cyber-box-section');
+    section.appendChild(createElement('h3', null, 'Style Profile'));
+
+    const grid = createElement('div', 'style-grid');
+    grid.append(
+        createLabeledValue('style-item', 'Aesthetics:', formatList(profile.aesthetics)),
+        createLabeledValue('style-item', 'Colors:', formatList(profile.colors)),
+        createLabeledValue('style-item', 'Silhouettes:', formatList(profile.silhouettes)),
+        createLabeledValue('style-item', 'Occasions:', formatList(profile.occasions)),
+        createLabeledValue('style-item', 'Dislikes:', formatList(profile.dislikes)),
+        createLabeledValue('style-item', 'Confidence:', formatConfidence(profile.confidence))
+    );
+    section.appendChild(grid);
+
+    const budgetSection = createElement('div', 'recommendations-section');
+    budgetSection.appendChild(createElement('h3', null, 'Budget'));
+    budgetSection.appendChild(createTextBlock('div', 'recommendations', formatBudget(profile.budget)));
+    section.appendChild(budgetSection);
+
+    const fitSection = createElement('div', 'recommendations-section');
+    fitSection.appendChild(createElement('h3', null, 'Fit Preferences'));
+    fitSection.appendChild(createTextBlock('div', 'recommendations', formatFitPreferences(profile.fitPreferences)));
+    section.appendChild(fitSection);
+
+    const keyPiecesSection = createElement('div', 'key-pieces-section');
+    keyPiecesSection.appendChild(createElement('h3', null, 'Key Pieces'));
+    keyPiecesSection.appendChild(createListBlock('key-pieces', profile.keyPieces, 'No key pieces defined'));
+    section.appendChild(keyPiecesSection);
+
+    section.appendChild(createButtonLink('/chat_bot.html', 'Update Style Profile'));
+    replaceChildren(styleContainer, section);
 }
 
 function displayNoMeasurements() {
-    document.getElementById('measurementsData').innerHTML = `
-        <div class="cyber-alert info">
-            <p>No measurements saved yet.</p>
-            <a href="/fit_calculator.html" class="cyber-button">
-                <span>Take the Fit Calculator</span>
-            </a>
-        </div>
-    `;
+    replaceChildren(
+        document.getElementById('measurementsData'),
+        createEmptyState('No measurements saved yet.', '/fit_calculator.html', 'Take the Fit Calculator')
+    );
 }
 
-function displayNoStylePreferences() {
-    document.getElementById('styleQuizData').innerHTML = `
-        <div class="cyber-alert info">
-            <p>No style preferences saved yet.</p>
-            <a href="/chat_bot.html" class="cyber-button">
-                <span>Take the Style Quiz</span>
-            </a>
-        </div>
-    `;
+function displayNoStyleProfile() {
+    replaceChildren(
+        document.getElementById('styleQuizData'),
+        createEmptyState('No style profile saved yet.', '/chat_bot.html', 'Take the Style Quiz')
+    );
 }
 
 function displayError(message) {
-    const errorHtml = `
-        <div class="cyber-alert error">
-            <p>Error: ${message}</p>
-            <p>Please try refreshing the page. If the problem persists, contact support.</p>
-        </div>
-    `;
-    
-    document.getElementById('measurementsData').innerHTML = errorHtml;
-    document.getElementById('styleQuizData').innerHTML = errorHtml;
-}
-
-// Reuse these functions from fit_calculator.js
-function calculateBodyType(measurements) {
-    const { bust, waist, hips } = measurements;
-    
-    if (hips - waist >= 10 && bust - waist >= 8) {
-        return "Hourglass";
-    } else if (hips - waist >= 8) {
-        return "Pear";
-    } else if (bust - waist >= 8) {
-        return "Apple";
-    } else {
-        return "Rectangle";
-    }
+    replaceChildren(document.getElementById('measurementsData'), createErrorState(message));
+    replaceChildren(document.getElementById('styleQuizData'), createErrorState(message));
 }
 
 function getRecommendations(bodyType) {
-    const recommendations = {
-        Hourglass: `
-            <ul>
-                <li>Fitted dresses that accentuate your waist</li>
-                <li>Wrap dresses and tops</li>
-                <li>Belt your outfits to highlight your waist</li>
-                <li>Form-fitting clothing that follows your curves</li>
-            </ul>`,
-        Pear: `
-            <ul>
-                <li>A-line skirts and dresses</li>
-                <li>Boat neck and wide-neck tops to balance proportions</li>
-                <li>Statement tops with detail around shoulders</li>
-                <li>Dark colors on bottom, bright colors on top</li>
-            </ul>`,
-        Apple: `
-            <ul>
-                <li>Empire waist dresses</li>
-                <li>V-neck tops to elongate torso</li>
-                <li>Flowy bottoms to create balance</li>
-                <li>Structured jackets that hit at the hip</li>
-            </ul>`,
-        Rectangle: `
-            <ul>
-                <li>Peplum tops to create curves</li>
-                <li>Layered clothing to add dimension</li>
-                <li>Belt at the waist to create definition</li>
-                <li>Ruffles and gathered details to add curves</li>
-            </ul>`
-    };
+    const items = window.StyleSeekerBodyLogic.getRecommendations(bodyType);
+    if (!items.length) {
+        return createElement('p', null, 'No specific recommendations available.');
+    }
 
-    return recommendations[bodyType] || '<p>No specific recommendations available.</p>';
+    const list = document.createElement('ul');
+    items.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        list.appendChild(listItem);
+    });
+    return list;
+}
+
+function createElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+}
+
+function createTextBlock(tagName, className, text) {
+    const element = createElement(tagName, className, text);
+    element.style.whiteSpace = 'pre-line';
+    return element;
+}
+
+function createListBlock(className, items, emptyText) {
+    const values = Array.isArray(items) ? items.filter(Boolean) : [];
+    if (!values.length) {
+        return createTextBlock('div', className, emptyText);
+    }
+
+    const container = createElement('div', className);
+    const list = document.createElement('ul');
+    values.forEach(value => {
+        const item = document.createElement('li');
+        item.textContent = value;
+        list.appendChild(item);
+    });
+    container.appendChild(list);
+    return container;
+}
+
+function replaceChildren(parent, ...children) {
+    parent.textContent = '';
+    parent.append(...children);
+}
+
+function createLabeledValue(className, labelText, valueText) {
+    const item = createElement('div', className);
+    item.append(createElement('span', 'label', labelText), createElement('span', 'value', valueText));
+    return item;
+}
+
+function createButtonLink(href, label) {
+    const link = createElement('a', 'cyber-button');
+    link.href = href;
+    link.appendChild(createElement('span', null, label));
+    return link;
+}
+
+function createEmptyState(message, href, label) {
+    const alert = createElement('div', 'cyber-alert info');
+    alert.append(createElement('p', null, message), createButtonLink(href, label));
+    return alert;
+}
+
+function createErrorState(message) {
+    const alert = createElement('div', 'cyber-alert error');
+    alert.append(
+        createElement('p', null, `Error: ${message}`),
+        createElement('p', null, 'Please try refreshing the page. If the problem persists, contact support.')
+    );
+    return alert;
+}
+
+function formatMeasurement(value) {
+    return Number.isFinite(Number(value)) ? String(value) : '0';
+}
+
+function formatList(items) {
+    const values = Array.isArray(items) ? items.filter(Boolean) : [];
+    return values.length ? values.join(', ') : 'Not set';
+}
+
+function formatConfidence(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) {
+        return 'Not set';
+    }
+
+    return `${Math.round(number * 100)}%`;
+}
+
+function formatBudget(budget = {}) {
+    if (!budget) return 'Not set';
+
+    const range = [];
+    if (Number.isFinite(Number(budget.min))) range.push(`${budget.currency || 'USD'} ${budget.min}`);
+    if (Number.isFinite(Number(budget.max))) range.push(`${budget.currency || 'USD'} ${budget.max}`);
+
+    const lines = [];
+    if (range.length) lines.push(range.join(' - '));
+    if (budget.notes) lines.push(budget.notes);
+
+    return lines.length ? lines.join('\n') : 'Not set';
+}
+
+function formatFitPreferences(fitPreferences = {}) {
+    if (!fitPreferences) return 'Not set';
+
+    const lines = [];
+    if (fitPreferences.preferredFits?.length) lines.push(`Preferred fits: ${fitPreferences.preferredFits.join(', ')}`);
+    if (fitPreferences.emphasis?.length) lines.push(`Emphasize: ${fitPreferences.emphasis.join(', ')}`);
+    if (fitPreferences.avoid?.length) lines.push(`Avoid: ${fitPreferences.avoid.join(', ')}`);
+    if (fitPreferences.notes) lines.push(fitPreferences.notes);
+
+    return lines.length ? lines.join('\n') : 'Not set';
 }

@@ -1,4 +1,3 @@
-console.log('Script loaded');
 document.addEventListener('DOMContentLoaded', () => {
     const screenContent = document.getElementById('screen-content');
     const powerBtn = document.getElementById('power-btn');
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             await flickerScreen();
             screenContent.style.opacity = '1';
-            screenContent.innerHTML = 'Select a Page';
+            screenContent.textContent = 'Select a Page';
         } else {
             // Power off sequence
             isPowered = false;
@@ -66,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add click event to the TV screen for navigation
     tvFrame.addEventListener('click', () => {
-        const currentContent = screenContent.innerHTML;
+        const currentContent = screenContent.textContent;
         if (isPowered && currentContent !== 'Select a Page') {
             for (const [screen, text] of Object.entries(content)) {
                 if (text === currentContent) {
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tvFrame.style.animation = 'channelChange 0.3s ease';
         
         setTimeout(() => {
-            screenContent.innerHTML = content[screen];
+            screenContent.textContent = content[screen];
             screenContent.style.opacity = '1';
             tvFrame.style.animation = '';
         }, 300);

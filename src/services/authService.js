@@ -15,18 +15,30 @@ async function loginUser(username, password) {
     return { success: true, user };
 }
 
-async function signupUser(username, password) {
+async function signupUser({ username, password, email, firstName, lastName }) {
     if (!username || !password) {
         return { status: 400, body: { message: 'Username and password are required' } };
     }
 
-    const existingUser = await User.findOne({ username });
+    const duplicateChecks = [{ username }];
+    if (email) {
+        duplicateChecks.push({ email });
+    }
+
+    const existingUser = await User.findOne({ $or: duplicateChecks });
     if (existingUser) {
-        return { status: 400, body: { message: 'Username already exists' } };
+        const field = existingUser.username === username ? 'Username' : 'Email';
+        return { status: 400, body: { message: `${field} already exists` } };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hashedPassword });
+    const user = new User({
+        username,
+        password: hashedPassword,
+        email,
+        firstName,
+        lastName
+    });
     await user.save();
 
     return { status: 201, body: { message: 'User created successfully' } };

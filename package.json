@@ -1,9 +1,13 @@
 {
   "name": "styleSeeker",
   "version": "1.0.0",
+  "scripts": {
+    "test": "jest --runInBand"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "bcrypt": "^5.0.1",
+    "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
     "express": "^4.17.1",
@@ -12,6 +16,8 @@
     "mongoose": "^6.0.12"
   },
   "devDependencies": {
-    "sass": "^1.77.8"
+    "jest": "^29.7.0",
+    "sass": "^1.77.8",
+    "supertest": "^7.1.4"
   }
 }

@@ -1,34 +1,20 @@
 const User = require('../../models/User');
+const { normalizeStyleProfile } = require('../utils/styleProfile');
 
 async function saveStylePreferences(userId, preferences) {
-    const user = await User.findById(userId);
-    if (!user) {
-        return null;
-    }
+    const styleProfile = normalizeStyleProfile(preferences);
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: { styleProfile },
+            $unset: { stylePreferences: '' }
+        },
+        { new: true, runValidators: false }
+    ).select('styleProfile');
 
-    user.stylePreferences = {
-        primaryStyle: preferences.primaryStyle,
-        secondaryStyle: preferences.secondaryStyle,
-        recommendations: preferences.recommendations,
-        keyPieces: preferences.keyPieces,
-        updatedAt: new Date()
-    };
-
-    await user.save();
-    return user.stylePreferences;
-}
-
-async function saveAesthetic(userId, aesthetic, description) {
-    return User.findByIdAndUpdate(userId, {
-        $set: {
-            aesthetic,
-            aestheticDescription: description,
-            aestheticDate: new Date()
-        }
-    });
+    return user?.styleProfile || null;
 }
 
 module.exports = {
-    saveStylePreferences,
-    saveAesthetic
+    saveStylePreferences
 };

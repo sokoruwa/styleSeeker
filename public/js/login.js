@@ -8,17 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('Login form submitted');
 
         // Get form data
         const formData = new FormData(this);
         const username = formData.get('username');
         const password = formData.get('password');
-
-        console.log('Form data collected:', { 
-            username: username ? 'exists' : 'missing',
-            password: password ? 'exists' : 'missing'
-        });
 
         if (!username || !password) {
             showError('Username and password are required');
@@ -38,10 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
-            console.log('Login response:', data);
 
             if (data.success) {
-                console.log('Login successful:', data);
                 window.location.href = '/';
             } else {
                 showError(data.message || 'Login failed');

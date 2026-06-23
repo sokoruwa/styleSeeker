@@ -4,24 +4,18 @@ const { getMeasurements, saveMeasurements } = require('../services/measurementSe
 const router = express.Router();
 
 router.post('/measurements', async (req, res) => {
-    console.log('Received measurements request');
-    console.log('Session:', req.session);
-    console.log('Body:', req.body);
-
     if (!req.session || !req.session.isLoggedIn) {
-        console.log('User not authenticated');
         return res.status(401).json({ message: 'Not authenticated' });
     }
 
     try {
         const measurements = await saveMeasurements(req.session.userId, req.body);
         if (!measurements) {
-            console.log('User not found');
             return res.status(404).json({ message: 'User not found' });
         }
 
         res.json({
-            message: 'Measurements saved successfully. <a href="/profile_page.html" class="alert-link">View your profile</a> to see your measurements.',
+            message: 'Measurements saved successfully.',
             measurements
         });
     } catch (error) {
@@ -43,9 +37,6 @@ router.get('/measurements', async (req, res) => {
         if (!result) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        console.log('Fetching measurements for user:', result.username);
-        console.log('Measurements data:', result.measurements);
 
         res.json(result);
     } catch (error) {

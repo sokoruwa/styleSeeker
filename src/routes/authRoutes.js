@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Login attempt for:', username);
 
     try {
         const result = await loginUser(username, password);
@@ -32,10 +31,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/signup', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        console.log('Signup request received:', { username });
-
-        const result = await signupUser(username, password);
+        const result = await signupUser(req.body);
         res.status(result.status).json(result.body);
     } catch (error) {
         console.error('Signup error:', error);
@@ -47,8 +43,6 @@ router.post('/signup', async (req, res) => {
 });
 
 router.get('/check-auth', (req, res) => {
-    console.log('Checking auth status. Session:', req.session);
-
     if (req.session && req.session.isLoggedIn) {
         return res.json({
             isLoggedIn: true,
@@ -57,14 +51,6 @@ router.get('/check-auth', (req, res) => {
     }
 
     res.json({ isLoggedIn: false });
-});
-
-router.get('/check-login', (req, res) => {
-    console.log('Check login session:', req.session);
-    res.json({
-        isLoggedIn: !!req.session.isLoggedIn,
-        username: req.session.username
-    });
 });
 
 router.post('/logout', (req, res) => {

@@ -1,6 +1,19 @@
 const conversationHistory = [];
 let isWaiting = false;
 
+function safeHttpUrl(value) {
+    if (typeof value !== 'string' || !value.trim()) {
+        return '';
+    }
+
+    try {
+        const url = new URL(value.trim());
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+    } catch (error) {
+        return '';
+    }
+}
+
 function addMessage(text, sender) {
     const messagesDiv = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
@@ -71,10 +84,49 @@ async function sendMessage(userText) {
                     fullResponse += data.text;
                     botMessageDiv.textContent = fullResponse;
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                } else if (data.type === 'products') {
+                    const grid = document.createElement('div');
+                    grid.className = 'product-grid';
+                    const products = Array.isArray(data.products) ? data.products : [];
+                    products.forEach(p => {
+                        const productUrl = safeHttpUrl(p.url);
+                        if (!productUrl) return;
+
+                        const card = document.createElement('a');
+                        card.className = 'product-card';
+                        card.href = productUrl;
+                        card.target = '_blank';
+                        card.rel = 'noopener noreferrer';
+
+                        const imageUrl = safeHttpUrl(p.image);
+                        if (imageUrl) {
+                            const image = document.createElement('img');
+                            image.src = imageUrl;
+                            image.alt = p.title || 'Product image';
+                            card.appendChild(image);
+                        }
+
+                        const info = document.createElement('div');
+                        info.className = 'product-info';
+
+                        const title = document.createElement('div');
+                        title.className = 'product-title';
+                        title.textContent = p.title || 'Untitled product';
+
+                        const price = document.createElement('div');
+                        price.className = 'product-price';
+                        price.textContent = p.price || '';
+
+                        info.append(title, price);
+                        card.appendChild(info);
+                        grid.appendChild(card);
+                    });
+                    messagesDiv.appendChild(grid);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } else if (data.type === 'saved') {
                     const savedDiv = document.createElement('div');
                     savedDiv.className = 'message bot-message save-confirmation';
-                    savedDiv.textContent = `✓ Style profile saved: ${data.preferences.primaryStyle}`;
+                    savedDiv.textContent = `✓ Style profile saved: ${data.profile?.aesthetics?.[0] || 'Updated profile'}`;
                     messagesDiv.appendChild(savedDiv);
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } else if (data.type === 'error') {

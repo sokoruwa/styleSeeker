@@ -9,6 +9,10 @@ const routes = require('./routes');
 function createApp() {
     const app = express();
 
+    if (config.trustProxy) {
+        app.set('trust proxy', 1);
+    }
+
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     app.use(sessionMiddleware());

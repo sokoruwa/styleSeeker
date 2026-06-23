@@ -28,11 +28,30 @@ const userSchema = new mongoose.Schema({
     aesthetic: String,
     aestheticDescription: String,
     aestheticDate: Date,
-    stylePreferences: {
-        primaryStyle: String,
-        secondaryStyle: String,
-        recommendations: String,
-        keyPieces: String,
+    styleProfile: {
+        aesthetics: [String],
+        colors: [String],
+        silhouettes: [String],
+        occasions: [String],
+        dislikes: [String],
+        budget: {
+            min: Number,
+            max: Number,
+            currency: String,
+            notes: String
+        },
+        fitPreferences: {
+            preferredFits: [String],
+            emphasis: [String],
+            avoid: [String],
+            notes: String
+        },
+        keyPieces: [String],
+        confidence: {
+            type: Number,
+            min: 0,
+            max: 1
+        },
         updatedAt: Date
     }
 }, { timestamps: true });

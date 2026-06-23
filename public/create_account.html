@@ -39,7 +39,7 @@
                     <li class="nav-item dropdown" id="userDropdown" style="display: none;">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> <span id="username">Hi User</span>
+                            <i class="fas fa-user-circle"></i> <span id="navUsername">Hi User</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="profile_page.html"><i class="fas fa-user"></i> Profile</a></li>
@@ -91,6 +91,7 @@
                     <button type="submit" class="cyber-button">
                         <span>Create Account</span>
                     </button>
+                    <div id="signupError" class="alert alert-danger mt-3" style="display: none;" role="alert"></div>
                 </form>
                 <div class="login-link">
                     <p>Already have an account?</p>

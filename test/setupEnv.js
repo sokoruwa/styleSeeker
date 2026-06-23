@@ -1,0 +1,9 @@
+process.env.NODE_ENV = 'test';
+process.env.PORT = process.env.PORT || '4000';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/styleSeeker_test';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-session-secret';
+process.env.CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4000';
+process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || 'test-anthropic-key';
+process.env.ANTHROPIC_TIMEOUT_MS = process.env.ANTHROPIC_TIMEOUT_MS || '50';
+process.env.EBAY_CLIENT_ID = process.env.EBAY_CLIENT_ID || 'test-ebay-client';
+process.env.EBAY_CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET || 'test-ebay-secret';

@@ -12,6 +12,31 @@ An AI-powered personal fashion assistant that helps users discover their style a
 
 ---
 
+## My Quick Start (Sophia's setup)
+
+Every time you restart your machine, run these before `node src/server.js`:
+
+```bash
+# 1. Start MongoDB (uses ~/mongodb-data as the data directory)
+mongod --dbpath ~/mongodb-data --fork --logpath ~/mongodb-data/mongod.log
+
+# 2. Switch to Node 18
+nvm use 18
+
+# 3. Start the app
+cd ~/Desktop/PERSONALPROJECTS/styleSeeker
+node src/server.js
+```
+
+Then open **http://localhost:4000**.
+
+To stop MongoDB when you're done:
+```bash
+lsof -ti:27017 | xargs kill
+```
+
+---
+
 ## Prerequisites
 
 Before you start, make sure you have the following installed:
@@ -48,40 +73,63 @@ npm install
 Create a file called `.env` in the project root (never commit this file):
 
 ```
+NODE_ENV=development
 PORT=4000
 MONGODB_URI=mongodb://localhost:27017/styleSeeker
+SESSION_SECRET=replace-with-a-long-random-secret
 ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-Replace `your_api_key_here` with your actual Anthropic API key. See `.env.example` for reference.
+Replace `SESSION_SECRET` with a long random value and `your_api_key_here` with your actual Anthropic API key. See `.env.example` for reference.
 
 ---
 
 ## Running the App
 
-You need two things running: MongoDB and the Node server. Use two separate terminal windows.
+You need two things running: MongoDB and the Node server.
 
-### Terminal 1 — Start MongoDB
+### Option A — MongoDB via Docker (recommended)
+
+If you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed, this is the easiest way — no permission errors, no data directory to manage.
+
+**First time only:**
+```bash
+docker run -d -p 27017:27017 --name styleseeker-mongo mongo:7
+```
+
+**Every time after:**
+```bash
+docker start styleseeker-mongo   # start
+docker stop styleseeker-mongo    # stop
+```
+
+**Check if it's running:**
+```bash
+docker ps
+```
+
+---
+
+### Option B — MongoDB manually
 
 ```bash
 mkdir -p ~/data/db
+sudo chown -R $(whoami) ~/data/db
 mongod --dbpath ~/data/db
 ```
 
-Leave this running. You should see `Waiting for connections` in the output.
+Leave this terminal running. You should see `Waiting for connections` in the output.
 
-### Terminal 2 — Start the server
+---
+
+### Terminal — Start the server
 
 ```bash
 cd ~/Desktop/PERSONALPROJECTS/styleSeeker
-node server.js
+node src/server.js
 ```
 
-You should see:
-```
-[dotenv] injecting env from .env
-Server running on port 4000
-```
+You should see the server start and log `Server running on port 4000`.
 
 ### Open the app
 
@@ -120,11 +168,31 @@ lsof -ti:27017 | xargs kill  # kill MongoDB
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `PORT` | Port to run the server on (default: 4000) |
-| `MONGODB_URI` | MongoDB connection string |
-| `ANTHROPIC_API_KEY` | Your Anthropic API key for StyleAI |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGODB_URI` | Yes | MongoDB connection string used by Mongoose |
+| `SESSION_SECRET` | Yes | Long random secret used to sign session cookies |
+| `NODE_ENV` | No | Set to `production` in production to enable secure cookies |
+| `PORT` | No | Port to run the server on (default: 4000) |
+| `CORS_ORIGIN` | No | Allowed browser origin (default: `http://localhost:4000`) |
+| `SESSION_NAME` | No | Session cookie name (default: `styleseeker.sid`) |
+| `SESSION_MAX_AGE_MS` | No | Session cookie lifetime in milliseconds (default: one day) |
+| `TRUST_PROXY` | No | Set to `true` when running behind a trusted HTTPS proxy |
+| `ANTHROPIC_API_KEY` | Yes for StyleAI | Anthropic API key for StyleAI chat |
+| `EBAY_CLIENT_ID` | No | eBay client ID for product search |
+| `EBAY_CLIENT_SECRET` | No | eBay client secret for product search |
+| `CHAT_MAX_MESSAGES` | No | Maximum messages allowed in one `/api/chat` request (default: 20) |
+| `CHAT_MAX_MESSAGE_LENGTH` | No | Maximum characters allowed per chat message (default: 2000) |
+| `CHAT_MAX_TOOL_LOOPS` | No | Maximum tool recursion loops allowed in chat (default: 3) |
+| `ANTHROPIC_TIMEOUT_MS` | No | Timeout for Anthropic provider calls in chat (default: 30000) |
+
+## Testing
+
+Run the API test suite with:
+
+```bash
+npm test
+```
 
 ---
 
@@ -151,6 +219,13 @@ mongod --dbpath ~/data/db
 **Port already in use**
 ```bash
 lsof -ti:4000 | xargs kill
+```
+
+**Check what's running**
+```bash
+lsof -i:4000    # is the server running?
+lsof -i:27017   # is MongoDB running?
+docker ps       # is MongoDB Docker container running?
 ```
 
 **StyleAI not responding**

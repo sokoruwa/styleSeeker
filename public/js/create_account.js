@@ -8,25 +8,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('Form submitted');
 
         // Get form values directly from the form
         const formData = new FormData(form);
         const username = formData.get('username');
         const password = formData.get('password');
+        const email = formData.get('email');
+        const firstName = formData.get('firstName');
+        const lastName = formData.get('lastName');
 
-        if (!username || !password) {
+        if (!username || !password || !email || !firstName || !lastName) {
             const errorDiv = document.getElementById('signupError');
             if (errorDiv) {
-                errorDiv.textContent = 'Username and password are required';
+                errorDiv.textContent = 'All fields are required';
                 errorDiv.style.display = 'block';
             }
             return;
         }
 
         try {
-            console.log('Sending signup request:', { username });
-
             const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
@@ -34,7 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     username,
-                    password
+                    password,
+                    email,
+                    firstName,
+                    lastName
                 })
             });
 

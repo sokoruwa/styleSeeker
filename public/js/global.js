@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const logoutButton = document.getElementById('logoutButton');
     if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault();
             try {
                 const response = await fetch('/api/logout', { method: 'POST' });
                 if (response.ok) {
@@ -21,7 +22,6 @@ async function checkLoginStatus() {
     try {
         const response = await fetch('/api/check-auth');
         const data = await response.json();
-        console.log("Login status data:", data);
         return data;
     } catch (error) {
         console.error("Error checking login status:", error);
@@ -32,7 +32,7 @@ async function checkLoginStatus() {
 function updateUI(loginStatus) {
     const loginNavItem = document.getElementById('loginNavItem');
     const userDropdown = document.getElementById('userDropdown');
-    const usernameSpan = document.getElementById('username');
+    const usernameSpan = document.getElementById('navUsername');
 
     if (loginStatus.isLoggedIn) {
         if (loginNavItem) loginNavItem.style.display = 'none';
