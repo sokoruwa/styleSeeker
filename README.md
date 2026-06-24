@@ -1,234 +1,187 @@
-# styleSeeker
+# styleseeker
 
-An AI-powered personal fashion assistant that helps users discover their style aesthetic through conversation. Features a real-time AI stylist (StyleAI) powered by Claude, body type analysis, and a style profile system with a focus on African-inspired aesthetics.
+An AI-powered personal fashion assistant that helps users discover their style aesthetic through conversation. It includes AI stylist chat powered by Anthropic Claude, body measurement analysis, saved style profiles, and account login/signup.
 
-**Features:**
-- StyleAI — conversational AI stylist that learns your vibe and saves your style profile
-- Fit calculator — body measurement input with body type analysis
-- Style profile — saved measurements, body type, and aesthetic preferences
-- Account system with login/signup
+## Tech Stack
 
-**Tech stack:** Node.js, Express, MongoDB, HTML/CSS, Bootstrap 5, Anthropic Claude API
-
----
-
-## My Quick Start (Sophia's setup)
-
-Every time you restart your machine, run these before `node src/server.js`:
-
-```bash
-# 1. Start MongoDB (uses ~/mongodb-data as the data directory)
-mongod --dbpath ~/mongodb-data --fork --logpath ~/mongodb-data/mongod.log
-
-# 2. Switch to Node 18
-nvm use 18
-
-# 3. Start the app
-cd ~/Desktop/PERSONALPROJECTS/styleSeeker
-node src/server.js
-```
-
-Then open **http://localhost:4000**.
-
-To stop MongoDB when you're done:
-```bash
-lsof -ti:27017 | xargs kill
-```
-
----
+- Node.js 18+
+- Express
+- MongoDB
+- HTML/CSS
+- Bootstrap 5
+- Anthropic Claude API
 
 ## Prerequisites
 
-Before you start, make sure you have the following installed:
+- Node.js 18 or newer
+  - Check with `node --version`
+  - If you use nvm: `nvm install 18 && nvm use 18`
+- npm
+- MongoDB 7, either local or Docker
+- Anthropic API key for AI stylist chat
+  - The rest of the app can run without it, but chat calls need `ANTHROPIC_API_KEY`.
 
-- **Node.js v18+** (v16 will not work — the app requires native fetch)
-  - Check your version: `node --version`
-  - Install/upgrade via nvm: `nvm install 18 && nvm use 18`
-  - Or via Homebrew: `brew install node@18`
-- **MongoDB v7**
-  - Check if installed: `mongod --version`
-  - Install via Homebrew: `brew install mongodb-community`
-- **npm** (comes with Node)
-- **An Anthropic API key** — get one at [console.anthropic.com](https://console.anthropic.com)
-
----
-
-## Setup
-
-### 1. Clone the repo
+## Fresh Clone Setup
 
 ```bash
 git clone https://github.com/sokoruwa/styleSeeker.git
 cd styleSeeker
+nvm use # optional, if you use nvm
+npm install
+cp .env.example .env
 ```
 
-### 2. Install dependencies
+Edit `.env` and set at least:
 
 ```bash
-npm install
-```
-
-### 3. Create your `.env` file
-
-Create a file called `.env` in the project root (never commit this file):
-
-```
-NODE_ENV=development
-PORT=4000
 MONGODB_URI=mongodb://localhost:27017/styleSeeker
 SESSION_SECRET=replace-with-a-long-random-secret
 ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-Replace `SESSION_SECRET` with a long random value and `your_api_key_here` with your actual Anthropic API key. See `.env.example` for reference.
+`ANTHROPIC_API_KEY` can be left blank while working on non-chat pages.
 
----
+## Local Development
 
-## Running the App
+You need MongoDB and the Node server running.
 
-You need two things running: MongoDB and the Node server.
+### 1. Start MongoDB
 
-### Option A — MongoDB via Docker (recommended)
+Docker option:
 
-If you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed, this is the easiest way — no permission errors, no data directory to manage.
-
-**First time only:**
 ```bash
 docker run -d -p 27017:27017 --name styleseeker-mongo mongo:7
 ```
 
-**Every time after:**
-```bash
-docker start styleseeker-mongo   # start
-docker stop styleseeker-mongo    # stop
-```
-
-**Check if it's running:**
-```bash
-docker ps
-```
-
----
-
-### Option B — MongoDB manually
+After the first Docker run, start or stop the same container with:
 
 ```bash
-mkdir -p ~/data/db
-sudo chown -R $(whoami) ~/data/db
-mongod --dbpath ~/data/db
+docker start styleseeker-mongo
+docker stop styleseeker-mongo
 ```
 
-Leave this terminal running. You should see `Waiting for connections` in the output.
-
----
-
-### Terminal — Start the server
+Local MongoDB option:
 
 ```bash
-cd ~/Desktop/PERSONALPROJECTS/styleSeeker
-node src/server.js
+mkdir -p ~/mongodb-data
+mongod --dbpath ~/mongodb-data
 ```
 
-You should see the server start and log `Server running on port 4000`.
+Leave the MongoDB terminal running if you use the local option.
 
-### Open the app
+### 2. Start the App
 
-Go to **http://localhost:4000** in your browser.
+For normal startup:
 
-> Note: Port 3000 may be used by another app on your machine. styleSeeker runs on port **4000**.
-
----
-
-## Stopping the App
-
-**Stop the server:** Press `Ctrl + C` in Terminal 2
-
-**Stop MongoDB:** Press `Ctrl + C` in Terminal 1
-
-**Kill by port (if needed):**
 ```bash
-lsof -ti:4000 | xargs kill   # kill server
-lsof -ti:27017 | xargs kill  # kill MongoDB
+npm start
 ```
 
----
+For development with automatic restart on file changes:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:4000`.
+
+## npm Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm start` | Starts the Express server with `node src/server.js`. |
+| `npm run dev` | Starts the server with Node watch mode. |
+| `npm test` | Runs the Jest API test suite. |
+| `npm run lint` | Runs a dependency-free JavaScript syntax check. |
 
 ## Pages
 
 | URL | Description |
-|-----|-------------|
-| `http://localhost:4000` | Home (retro TV landing page) |
+| --- | --- |
+| `http://localhost:4000` | Home |
 | `http://localhost:4000/login.html` | Login |
 | `http://localhost:4000/create_account.html` | Sign up |
-| `http://localhost:4000/fit_calculator.html` | Body measurement + body type analysis |
-| `http://localhost:4000/chat_bot.html` | StyleAI — AI stylist chat |
-| `http://localhost:4000/profile_page.html` | Your style profile (requires login) |
-
----
+| `http://localhost:4000/fit_calculator.html` | Body measurement and body type analysis |
+| `http://localhost:4000/chat_bot.html` | AI stylist chat |
+| `http://localhost:4000/profile_page.html` | Style profile, requires login |
 
 ## Environment Variables
 
 | Variable | Required | Description |
-|----------|----------|-------------|
-| `MONGODB_URI` | Yes | MongoDB connection string used by Mongoose |
-| `SESSION_SECRET` | Yes | Long random secret used to sign session cookies |
-| `NODE_ENV` | No | Set to `production` in production to enable secure cookies |
-| `PORT` | No | Port to run the server on (default: 4000) |
-| `CORS_ORIGIN` | No | Allowed browser origin (default: `http://localhost:4000`) |
-| `SESSION_NAME` | No | Session cookie name (default: `styleseeker.sid`) |
-| `SESSION_MAX_AGE_MS` | No | Session cookie lifetime in milliseconds (default: one day) |
-| `TRUST_PROXY` | No | Set to `true` when running behind a trusted HTTPS proxy |
-| `ANTHROPIC_API_KEY` | Yes for StyleAI | Anthropic API key for StyleAI chat |
-| `EBAY_CLIENT_ID` | No | eBay client ID for product search |
-| `EBAY_CLIENT_SECRET` | No | eBay client secret for product search |
-| `CHAT_MAX_MESSAGES` | No | Maximum messages allowed in one `/api/chat` request (default: 20) |
-| `CHAT_MAX_MESSAGE_LENGTH` | No | Maximum characters allowed per chat message (default: 2000) |
-| `CHAT_MAX_TOOL_LOOPS` | No | Maximum tool recursion loops allowed in chat (default: 3) |
-| `ANTHROPIC_TIMEOUT_MS` | No | Timeout for Anthropic provider calls in chat (default: 30000) |
+| --- | --- | --- |
+| `MONGODB_URI` | Yes | MongoDB connection string used by Mongoose. |
+| `SESSION_SECRET` | Yes | Secret used to sign session cookies. |
+| `NODE_ENV` | No | Use `production` in production to enable secure cookies. |
+| `PORT` | No | Server port, defaults to `4000`. |
+| `CORS_ORIGIN` | No | Allowed browser origin, defaults to `http://localhost:4000`. |
+| `SESSION_NAME` | No | Session cookie name, defaults to `styleseeker.sid`. |
+| `SESSION_MAX_AGE_MS` | No | Session cookie lifetime, defaults to one day. |
+| `TRUST_PROXY` | No | Set to `true` when running behind a trusted HTTPS proxy. |
+| `ANTHROPIC_API_KEY` | Required for chat | Anthropic API key for chat. |
+| `EBAY_CLIENT_ID` | No | eBay client ID for product search. |
+| `EBAY_CLIENT_SECRET` | No | eBay client secret for product search. |
+| `CHAT_MAX_MESSAGES` | No | Maximum messages in one `/api/chat` request, defaults to `20`. |
+| `CHAT_MAX_MESSAGE_LENGTH` | No | Maximum characters per chat message, defaults to `2000`. |
+| `CHAT_MAX_TOOL_LOOPS` | No | Maximum tool recursion loops in chat, defaults to `3`. |
+| `ANTHROPIC_TIMEOUT_MS` | No | Timeout for Anthropic provider calls, defaults to `30000`. |
 
-## Testing
-
-Run the API test suite with:
+## Testing and Checks
 
 ```bash
+npm run lint
 npm test
 ```
 
----
+The tests provide their own test environment variables in `test/setupEnv.js`.
+
+## Stopping Local Services
+
+Stop the Node server with `Ctrl+C`.
+
+Stop Docker MongoDB:
+
+```bash
+docker stop styleseeker-mongo
+```
+
+Stop local MongoDB with `Ctrl+C` in its terminal. If needed, find processes by port:
+
+```bash
+lsof -i:4000
+lsof -i:27017
+```
 
 ## Troubleshooting
 
-**`fetch is not defined` error on startup**
-Your Node.js version is too old. Upgrade to v18+:
+`fetch is not defined`
+
+Use Node 18 or newer:
+
 ```bash
-nvm install 18 && nvm use 18
+nvm install 18
+nvm use 18
 ```
 
-**`Permission denied` on MongoDB socket**
+`MONGODB_URI is required` or `SESSION_SECRET is required`
+
+Create `.env` from `.env.example` and fill in the required values:
+
 ```bash
-sudo rm /tmp/mongodb-27017.sock
-mongod --dbpath ~/data/db
+cp .env.example .env
 ```
 
-**`Permission denied` on MongoDB data directory**
+MongoDB connection errors
+
+Make sure MongoDB is running and that `MONGODB_URI` points to the same host and port. The default local URI is:
+
 ```bash
-sudo chown -R $(whoami) ~/data/db
-mongod --dbpath ~/data/db
+mongodb://localhost:27017/styleSeeker
 ```
 
-**Port already in use**
-```bash
-lsof -ti:4000 | xargs kill
-```
+Port `4000` already in use
 
-**Check what's running**
-```bash
-lsof -i:4000    # is the server running?
-lsof -i:27017   # is MongoDB running?
-docker ps       # is MongoDB Docker container running?
-```
+Either stop the process using that port or set a different `PORT` in `.env`.
 
-**StyleAI not responding**
-- Check your `ANTHROPIC_API_KEY` in `.env` is valid and not revoked
-- Check the server terminal for error messages
-- Make sure you have credits at [console.anthropic.com](https://console.anthropic.com)
+Chat is not responding
+
+Check that `ANTHROPIC_API_KEY` is set, valid, and has available credits.
