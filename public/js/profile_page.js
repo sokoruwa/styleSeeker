@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 function displayMeasurements(measurements) {
     const measurementsContainer = document.getElementById('measurementsData');
-    const bodyType = window.StyleSeekerBodyLogic.calculateBodyType(measurements);
+    const bodyType = window.thriftAssistBodyLogic.calculateBodyType(measurements);
 
     const section = createElement('div', 'cyber-box-section');
     section.appendChild(createElement('h3', null, 'Body Measurements'));
@@ -120,7 +120,7 @@ function displayError(message) {
 }
 
 function getRecommendations(bodyType) {
-    const items = window.StyleSeekerBodyLogic.getRecommendations(bodyType);
+    const items = window.thriftAssistBodyLogic.getRecommendations(bodyType);
     if (!items.length) {
         return createElement('p', null, 'No specific recommendations available.');
     }

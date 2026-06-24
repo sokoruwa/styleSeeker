@@ -21,7 +21,7 @@ module.exports = {
     mongoUri: requireEnv('MONGODB_URI'),
     corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:4000',
     sessionSecret: requireEnv('SESSION_SECRET'),
-    sessionName: process.env.SESSION_NAME || 'styleseeker.sid',
+    sessionName: process.env.SESSION_NAME || 'thriftAssist.sid',
     sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS) || 24 * 60 * 60 * 1000,
     trustProxy: isProduction || process.env.TRUST_PROXY === 'true',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,

@@ -242,7 +242,7 @@ describe('chat route', () => {
             messages: [{ role: 'user', content: 'Are you there?' }]
         }).expect(200);
 
-        expect(response.text).toContain("I'm having trouble reaching StyleAI right now.");
+        expect(response.text).toContain("I'm having trouble reaching thriftAssist right now.");
         expect(response.text).toContain('"type":"done"');
     });
 
@@ -350,7 +350,7 @@ describe('chat route', () => {
             messages: [{ role: 'user', content: 'Keep using tools.' }]
         }).expect(200);
 
-        expect(response.text).toContain("I'm having trouble reaching StyleAI right now.");
+        expect(response.text).toContain("I'm having trouble reaching thriftAssist right now.");
         expect(response.text).toContain('"type":"done"');
         expect(mockAnthropicStream).toHaveBeenCalledTimes(4);
     });
@@ -441,5 +441,100 @@ describe('chat route', () => {
             keyPieces: ['Ankara skirt', 'fitted tee'],
             confidence: 0.86
         });
+    });
+
+    test('builds ranked product recommendations from structured search intents', async () => {
+        const { agent } = createLoggedInAgent();
+        await signupAndLogin(agent);
+
+        await agent.post('/api/save-style-profile').send({
+            aesthetics: ['Modern Ankara', 'Minimalist'],
+            colors: ['indigo', 'white'],
+            silhouettes: ['A-line skirts'],
+            occasions: ['casual weekends'],
+            dislikes: ['neon'],
+            budget: { min: 30, max: 80, currency: 'USD' },
+            fitPreferences: {
+                preferredFits: ['fitted tops'],
+                emphasis: ['waist'],
+                avoid: ['stiff fabrics']
+            },
+            keyPieces: ['Ankara skirt', 'fitted tee'],
+            confidence: 0.86
+        }).expect(200);
+
+        searchEbayProducts.mockResolvedValue([
+            {
+                title: 'Neon bodycon party dress',
+                price: '35 USD',
+                image: 'https://example.com/neon.jpg',
+                url: 'https://example.com/neon'
+            },
+            {
+                title: 'Indigo Ankara A-line wrap skirt',
+                price: '52 USD',
+                image: 'https://example.com/skirt.jpg',
+                url: 'https://example.com/skirt'
+            }
+        ]);
+
+        mockAnthropicStreams.push(
+            createAnthropicStream({
+                finalMessage: {
+                    stop_reason: 'tool_use',
+                    content: [
+                        {
+                            type: 'tool_use',
+                            id: 'tool-recommend',
+                            name: 'recommend_products',
+                            input: {
+                                intents: [
+                                    {
+                                        query: 'ankara wrap skirt',
+                                        pieceType: 'skirt',
+                                        colors: ['indigo'],
+                                        occasion: 'casual weekends',
+                                        mustHave: ['wrap', 'A-line'],
+                                        avoid: ['neon'],
+                                        maxPrice: 80
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }),
+            createAnthropicStream({
+                events: [
+                    { type: 'content_block_delta', delta: { type: 'text_delta', text: 'The indigo wrap skirt is the strongest match.' } }
+                ],
+                finalMessage: {
+                    stop_reason: 'end_turn',
+                    content: [{ type: 'text', text: 'The indigo wrap skirt is the strongest match.' }]
+                }
+            })
+        );
+
+        const response = await agent.post('/api/chat').send({
+            messages: [{ role: 'user', content: 'Find me something to buy.' }]
+        }).expect(200);
+
+        expect(searchEbayProducts).toHaveBeenCalledWith('ankara wrap skirt pre-owned vintage');
+        expect(response.text).toContain('"type":"products"');
+        expect(response.text.indexOf('Indigo Ankara A-line wrap skirt')).toBeLessThan(response.text.indexOf('Neon bodycon party dress'));
+        expect(response.text).toContain('The indigo wrap skirt is the strongest match.');
+        expect(mockAnthropicStream).toHaveBeenLastCalledWith(expect.objectContaining({
+            messages: expect.arrayContaining([
+                expect.objectContaining({
+                    role: 'user',
+                    content: expect.arrayContaining([
+                        expect.objectContaining({
+                            type: 'tool_result',
+                            content: expect.stringContaining('matchReasons')
+                        })
+                    ])
+                })
+            ])
+        }));
     });
 });

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('measurementForm');
-    const bodyLogic = window.StyleSeekerBodyLogic;
+    const bodyLogic = window.thriftAssistBodyLogic;
 
     if (!form || !bodyLogic) {
         return;

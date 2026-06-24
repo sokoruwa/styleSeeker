@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 process.env.PORT = process.env.PORT || '4000';
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/styleSeeker_test';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/thriftAssist_test';
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-session-secret';
 process.env.CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4000';
 process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || 'test-anthropic-key';

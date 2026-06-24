@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('userInput');
 
     // Greeting
-    addMessage("Hey! I'm StyleAI ✨ I'm here to help you discover your personal style. Tell me a little about yourself — what's your vibe?", 'bot');
+    addMessage("Hey! I'm thriftAssist ✨ I'm here to help you build a sustainable thrift-first style. Tell me a little about your vibe, what you already own, and what you want to find secondhand.", 'bot');
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();

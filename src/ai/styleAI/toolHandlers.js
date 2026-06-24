@@ -1,4 +1,5 @@
 const { getToolProfilePayload, loadUserProfile, saveStyleProfile } = require('./profileStore');
+const { recommendProducts } = require('./productRecommendations');
 const { searchProducts } = require('./productSearch');
 const { writeSse } = require('./streaming');
 
@@ -43,6 +44,37 @@ async function handleToolUse(block, userId, res) {
             found: result.products.length,
             items: result.products.map(product => product.title)
         });
+    }
+
+    if (block.name === 'recommend_products') {
+        try {
+            const user = await loadUserProfile(userId);
+            const result = await recommendProducts({
+                intents: block.input?.intents,
+                user
+            });
+
+            if (result.error) {
+                return JSON.stringify({ error: result.error });
+            }
+
+            if (result.recommendations.length > 0) {
+                writeSse(res, { type: 'products', products: result.recommendations });
+            }
+
+            return JSON.stringify({
+                intents: result.intents,
+                recommendations: result.recommendations.map(product => ({
+                    title: product.title,
+                    price: product.price,
+                    score: product.score,
+                    matchReasons: product.matchReasons,
+                    searchIntent: product.searchIntent
+                }))
+            });
+        } catch (error) {
+            return JSON.stringify({ error: 'Could not build product recommendations' });
+        }
     }
 
     if (block.name === 'save_style_profile') {

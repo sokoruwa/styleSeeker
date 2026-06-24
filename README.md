@@ -1,6 +1,17 @@
-# styleseeker
+# thriftAssist
 
-An AI-powered personal fashion assistant that helps users discover their style aesthetic through conversation. It includes AI stylist chat powered by Anthropic Claude, body measurement analysis, saved style profiles, and account login/signup.
+An AI-powered sustainable fashion assistant that helps users build personal style through thrift-first, lower-waste recommendations. It includes AI stylist chat powered by Anthropic Claude, body measurement analysis, saved style profiles, eBay-powered secondhand product recommendations, and account login/signup.
+
+> thriftAssist is designed around sustainable fashion: secondhand finds, vintage pieces, wardrobe remixing, repair, rewearing, and buying fewer better items.
+
+## Sustainable Fashion Focus
+
+| Principle | How thriftAssist Applies It |
+| --- | --- |
+| Thrift first | Product searches are nudged toward secondhand, pre-owned, and vintage eBay listings. |
+| Lower waste | The chat encourages rewearing, remixing, tailoring, and mending before buying new. |
+| Personal fit | Recommendations still account for body type, aesthetics, colors, budget, and occasions. |
+| Transparent matches | The backend ranks products and gives match reasons before the AI explains them. |
 
 ## Tech Stack
 
@@ -10,6 +21,7 @@ An AI-powered personal fashion assistant that helps users discover their style a
 - HTML/CSS
 - Bootstrap 5
 - Anthropic Claude API
+- eBay Browse API for thrift-first product search
 
 ## Prerequisites
 
@@ -18,28 +30,39 @@ An AI-powered personal fashion assistant that helps users discover their style a
   - If you use nvm: `nvm install 18 && nvm use 18`
 - npm
 - MongoDB 7, either local or Docker
-- Anthropic API key for AI stylist chat
+- Anthropic API key for sustainable AI stylist chat
   - The rest of the app can run without it, but chat calls need `ANTHROPIC_API_KEY`.
+- eBay API credentials for product recommendations
+  - The rest of the app can run without them, but eBay product search needs `EBAY_CLIENT_ID` and `EBAY_CLIENT_SECRET`.
 
 ## Fresh Clone Setup
 
 ```bash
-git clone https://github.com/sokoruwa/styleSeeker.git
-cd styleSeeker
+git clone https://github.com/sokoruwa/thriftAssist.git
+cd thriftAssist
 nvm use # optional, if you use nvm
 npm install
-cp .env.example .env
 ```
 
-Edit `.env` and set at least:
+Create your local `.env` file. This file stores settings for your machine and is not committed to Git.
 
 ```bash
-MONGODB_URI=mongodb://localhost:27017/styleSeeker
-SESSION_SECRET=replace-with-a-long-random-secret
-ANTHROPIC_API_KEY=your_api_key_here
+cp -n .env.example .env
 ```
 
-`ANTHROPIC_API_KEY` can be left blank while working on non-chat pages.
+That command copies `.env.example` to `.env` only if `.env` does not already exist. If you already have a `.env` file, leave it alone.
+
+Open `.env` and set at least:
+
+```bash
+MONGODB_URI=mongodb://127.0.0.1:27017/thriftAssist
+SESSION_SECRET=replace-with-a-long-random-secret
+ANTHROPIC_API_KEY=your_api_key_here
+EBAY_CLIENT_ID=your_ebay_client_id
+EBAY_CLIENT_SECRET=your_ebay_client_secret
+```
+
+`ANTHROPIC_API_KEY`, `EBAY_CLIENT_ID`, and `EBAY_CLIENT_SECRET` can be left blank while working on non-chat and non-product-search pages.
 
 ## Local Development
 
@@ -50,14 +73,14 @@ You need MongoDB and the Node server running.
 Docker option:
 
 ```bash
-docker run -d -p 27017:27017 --name styleseeker-mongo mongo:7
+docker run -d -p 27017:27017 --name thriftAssist-mongo mongo:7
 ```
 
 After the first Docker run, start or stop the same container with:
 
 ```bash
-docker start styleseeker-mongo
-docker stop styleseeker-mongo
+docker start thriftAssist-mongo
+docker stop thriftAssist-mongo
 ```
 
 Local MongoDB option:
@@ -102,7 +125,7 @@ Open `http://localhost:4000`.
 | `http://localhost:4000/login.html` | Login |
 | `http://localhost:4000/create_account.html` | Sign up |
 | `http://localhost:4000/fit_calculator.html` | Body measurement and body type analysis |
-| `http://localhost:4000/chat_bot.html` | AI stylist chat |
+| `http://localhost:4000/chat_bot.html` | Sustainable AI stylist chat |
 | `http://localhost:4000/profile_page.html` | Style profile, requires login |
 
 ## Environment Variables
@@ -114,12 +137,12 @@ Open `http://localhost:4000`.
 | `NODE_ENV` | No | Use `production` in production to enable secure cookies. |
 | `PORT` | No | Server port, defaults to `4000`. |
 | `CORS_ORIGIN` | No | Allowed browser origin, defaults to `http://localhost:4000`. |
-| `SESSION_NAME` | No | Session cookie name, defaults to `styleseeker.sid`. |
+| `SESSION_NAME` | No | Session cookie name, defaults to `thriftAssist.sid`. |
 | `SESSION_MAX_AGE_MS` | No | Session cookie lifetime, defaults to one day. |
 | `TRUST_PROXY` | No | Set to `true` when running behind a trusted HTTPS proxy. |
 | `ANTHROPIC_API_KEY` | Required for chat | Anthropic API key for chat. |
-| `EBAY_CLIENT_ID` | No | eBay client ID for product search. |
-| `EBAY_CLIENT_SECRET` | No | eBay client secret for product search. |
+| `EBAY_CLIENT_ID` | Required for product search | eBay client ID for thrift-first product recommendations. |
+| `EBAY_CLIENT_SECRET` | Required for product search | eBay client secret for thrift-first product recommendations. |
 | `CHAT_MAX_MESSAGES` | No | Maximum messages in one `/api/chat` request, defaults to `20`. |
 | `CHAT_MAX_MESSAGE_LENGTH` | No | Maximum characters per chat message, defaults to `2000`. |
 | `CHAT_MAX_TOOL_LOOPS` | No | Maximum tool recursion loops in chat, defaults to `3`. |
@@ -141,7 +164,7 @@ Stop the Node server with `Ctrl+C`.
 Stop Docker MongoDB:
 
 ```bash
-docker stop styleseeker-mongo
+docker stop thriftAssist-mongo
 ```
 
 Stop local MongoDB with `Ctrl+C` in its terminal. If needed, find processes by port:
@@ -175,7 +198,16 @@ MongoDB connection errors
 Make sure MongoDB is running and that `MONGODB_URI` points to the same host and port. The default local URI is:
 
 ```bash
-mongodb://localhost:27017/styleSeeker
+mongodb://127.0.0.1:27017/thriftAssist
+```
+
+`Failed to unlink socket file` with `/tmp/mongodb-27017.sock`
+
+Remove the stale MongoDB socket file, then start MongoDB again:
+
+```bash
+sudo rm /tmp/mongodb-27017.sock
+mongod --dbpath ~/mongodb-data
 ```
 
 Port `4000` already in use

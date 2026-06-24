@@ -43,7 +43,7 @@ function validateMessages(messages) {
 function fallbackEvent() {
     return `data: ${JSON.stringify({
         type: 'text',
-        text: "I'm having trouble reaching StyleAI right now. Please try again in a moment."
+        text: "I'm having trouble reaching thriftAssist right now. Please try again in a moment."
     })}\n\n`;
 }
 

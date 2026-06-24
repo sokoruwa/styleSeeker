@@ -59,7 +59,7 @@
         return recommendations[bodyType] ? [...recommendations[bodyType]] : [];
     }
 
-    window.StyleSeekerBodyLogic = {
+    window.thriftAssistBodyLogic = {
         analyzeMeasurements,
         calculateBodyType,
         getRecommendations

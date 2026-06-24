@@ -26,10 +26,11 @@ async function getEbayToken() {
     return ebayToken;
 }
 
-async function searchEbayProducts(query) {
+async function searchEbayProducts(query, options = {}) {
     const token = await getEbayToken();
     const fetch = getFetch();
-    const response = await fetch(`https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=4`, {
+    const limit = Math.min(20, Math.max(1, Number(options.limit) || 8));
+    const response = await fetch(`https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
         headers: { Authorization: `Bearer ${token}` }
     });
     const data = await response.json();
